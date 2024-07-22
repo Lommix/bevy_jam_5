@@ -1,29 +1,47 @@
-// Bevy code commonly triggers these lints and they may be important signals
-// about code quality. They are sometimes hard to avoid though, and the CI
-// workflow treats them as errors, so this allows them throughout the project.
-// Feel free to delete this line.
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+mod assets;
+mod flow;
+mod items;
+mod menu;
+mod state;
+mod ui;
+mod village;
+
+#[allow(unused)]
+pub mod prelude {
+    pub use super::assets::*;
+    pub use super::flow::prelude::*;
+    pub use super::items::prelude::*;
+    pub use super::state::GameState;
+    pub use super::ui::prelude::*;
+    pub use super::village::prelude::*;
+    pub use bevy::prelude::*;
+}
+
+#[rustfmt::skip]
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(AssetPlugin {
-            // Wasm builds will check for meta files (that don't exist) if this isn't set.
-            // This causes errors and even panics in web builds on itch.
-            // See https://github.com/bevyengine/bevy_github_ci_template/issues/48.
             meta_check: AssetMetaCheck::Never,
             ..default()
         }))
-        .add_systems(Startup, setup)
+        .add_plugins((
+            sickle_ui::SickleUiPlugin,
+            avian2d::PhysicsPlugins::default(),
+            WorldInspectorPlugin::default(),
+        ))
+        .add_plugins((
+            ui::UiPlugin,
+            menu::MenuPlugin,
+            state::GameStatePlugin,
+            flow::GameFlowPlugin,
+            village::VillagePlugin,
+            items::InventoryPlugin,
+        ))
         .run();
-}
-
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("ducky.png"),
-        ..Default::default()
-    });
 }
