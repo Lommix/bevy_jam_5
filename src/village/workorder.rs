@@ -1,12 +1,16 @@
 pub use crate::prelude::*;
 
+pub mod prelude {
+    pub use super::{WorkOrder, WorkOrderFinished};
+}
+
 pub struct WorkOrderPlugin;
 impl Plugin for WorkOrderPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<Village>()
             .register_type::<WorkOrder>()
             .add_systems(
-                OnExit(ControlState::Autoplay),
+                OnExit(ControlFlow::Autoplay),
                 progress_workorder,
             );
     }
@@ -17,23 +21,22 @@ impl Plugin for WorkOrderPlugin {
 pub struct WorkOrder {
     pub remaining_turns: u32,
     pub workforce: u32,
+    pub outcome: Entity,
 }
 
-#[derive(Event, Deref, DerefMut)]
-pub struct WorkOrderFinishedEvent(Entity);
+#[derive(Event)]
+pub struct WorkOrderFinished;
 
 pub(crate) fn progress_workorder(
-    mut events: EventWriter<WorkOrderFinishedEvent>,
+    mut cmd: Commands,
     mut query: Query<(Entity, &mut WorkOrder)>,
 ) {
     query.iter_mut().for_each(|(entity, mut order)| {
         if order.remaining_turns - 1 == 0 {
-            events.send(WorkOrderFinishedEvent(entity));
+            cmd.trigger_targets(WorkOrderFinished, entity);
             return;
         }
         order.remaining_turns =
             order.remaining_turns.checked_sub(1).unwrap_or_default();
     });
-
-    info!("workorders progressed");
 }

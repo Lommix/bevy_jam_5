@@ -1,39 +1,39 @@
 use crate::prelude::*;
 use sickle_ui::prelude::*;
 
-use bevy::prelude::*;
 pub struct PlayerTurnPlugin;
 impl Plugin for PlayerTurnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            OnEnter(ControlState::PlayerTurn),
-            start_turn,
-        );
+        app.add_systems(OnEnter(ControlFlow::PlayerTurn), start_turn);
     }
 }
 
-fn start_turn(mut cmd: Commands) {
-    cmd.ui_builder(UiRoot)
-        .container(NodeBundle::default(), |builder| {
-            builder
-                .style()
-                .width(Val::Percent(100.))
-                .height(Val::Percent(100.))
-                .display(Display::Flex)
-                .justify_content(JustifyContent::Center)
-                .align_items(AlignItems::End);
+// enable clicking
+// make descision
+// end turn
+fn start_turn(
+    mut cmd: Commands,
+    query: Query<Entity, With<BottomUi>>,
+) {
+    let Ok(bottom_ui) = query.get_single() else {
+        return;
+    };
 
+    cmd.ui_builder(bottom_ui)
+        .div_centered(|builder| {
             builder
-                .button("End turn", Size::Medium, ())
+                .button(|builder| {
+                    builder.text("End this turn", Size::Large);
+                })
                 .entity_commands()
                 .observe(end_turn);
         })
-        .insert(StateScoped(ControlState::PlayerTurn));
+        .insert(StateScoped(ControlFlow::PlayerTurn));
 }
 
 fn end_turn(
     _trigger: Trigger<ButtonClicked>,
-    mut flow: ResMut<NextState<ControlState>>,
+    mut flow: ResMut<NextState<ControlFlow>>,
 ) {
-    flow.set(ControlState::Autoplay)
+    flow.set(ControlFlow::Autoplay)
 }

@@ -36,7 +36,7 @@ fn show_overlay(mut cmd: Commands) {
     cmd.ui_builder(UiRoot).container(NodeBundle::default(), |builder|{
         builder
             .slider(SliderConfig{
-                label: Some( "Volume".into() ),
+                label: Some("Volume".into() ),
                 min: 0.,
                 max: 1.,
                 initial_value: 1.,
@@ -47,5 +47,6 @@ fn show_overlay(mut cmd: Commands) {
             .style()
             .width(Val::Px(200.))
             .height(Val::Px(50.));
+
     }).insert(StateScoped(OverlayState::Shown));
 }

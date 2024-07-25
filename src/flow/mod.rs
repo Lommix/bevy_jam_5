@@ -2,30 +2,46 @@ use crate::prelude::*;
 use sickle_ui::prelude::*;
 
 mod autoplay;
+mod game_over;
+mod new_game;
 mod news;
 mod player_turn;
+mod seasons;
+mod session;
 
 #[allow(unused)]
 pub mod prelude {
+    pub use super::seasons::{
+        Season, SeasonPlugin, SeasonShiftEvent,
+    };
+    pub use super::session::{GameContext, GameSessionBundle};
     pub use super::{
-        ControlState, GameFlowPlugin, Season, SeasonOrder,
+        ControlFlow, GameFlowPlugin, GameSysSets, Player,
     };
 }
 
 #[derive(SubStates, Debug, Default, Hash, Clone, PartialEq, Eq)]
-#[source(GameState = GameState::Playing)]
-pub enum ControlState {
+#[source(AppState = AppState::Playing)]
+pub enum ControlFlow {
     #[default]
+    Intro,
     News,
     PlayerTurn,
     Autoplay,
+    Score,
 }
 
-#[derive(Resource, Default)]
-pub struct GameSession {
-    rounds_elapes: u32,
-    current_season: Season,
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
+pub struct GameSysLabel;
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub enum GameSysSets {
+    InMenu,
+    InGame,
 }
+
+#[derive(Component)]
+pub struct Player;
 
 pub struct GameFlowPlugin;
 impl Plugin for GameFlowPlugin {
@@ -34,35 +50,24 @@ impl Plugin for GameFlowPlugin {
             autoplay::AutplayPlugin,
             player_turn::PlayerTurnPlugin,
             news::NewsPlugin,
+            seasons::SeasonPlugin,
+            game_over::GameOverPlugin,
         ));
 
-        app.init_resource::<GameSession>()
-            .init_state::<ControlState>()
-            .enable_state_scoped_entities::<ControlState>()
-            .add_systems(OnEnter(GameState::Playing), new_game);
+        app.configure_sets(
+            Update,
+            (
+                GameSysSets::InMenu.run_if(in_state(AppState::Menu)),
+                GameSysSets::InGame
+                    .run_if(in_state(AppState::Playing)),
+            ),
+        );
+
+        app.init_state::<ControlFlow>()
+            .enable_state_scoped_entities::<ControlFlow>()
+            .add_systems(
+                OnEnter(AppState::Playing),
+                new_game::new_game,
+            );
     }
-}
-
-#[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
-pub enum Season {
-    #[default]
-    Spring,
-    Summer,
-    Autum,
-    Winter,
-}
-
-pub const SeasonOrder: &[Season; 4] = &[
-    Season::Spring,
-    Season::Summer,
-    Season::Autum,
-    Season::Winter,
-];
-
-fn new_game(
-    mut cmd: Commands,
-    mut flow: ResMut<NextState<ControlState>>,
-) {
-    cmd.insert_resource(GameSession::default());
-    flow.set(ControlState::PlayerTurn)
 }
