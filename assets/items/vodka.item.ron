@@ -1,0 +1,10 @@
+(
+    item: (
+        name: "Vodka",
+        description: "A strong alcoholic drink from distilled wheat",
+        icon: "vodka",
+    ),
+    value: (20.49),
+    rarity: Rare,
+    tags: [Sellable],
+)

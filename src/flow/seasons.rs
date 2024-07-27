@@ -37,7 +37,17 @@ fn next_season(
 }
 
 #[derive(
-    Hash, Reflect, PartialEq, Eq, Debug, Default, Clone, Copy, States,
+    Hash,
+    Reflect,
+    PartialEq,
+    Eq,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    States,
+    serde::Deserialize,
+    serde::Serialize,
 )]
 #[reflect]
 pub enum Season {

@@ -7,12 +7,15 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod app_state;
 mod assets;
+mod common;
 mod flow;
 mod items;
+mod render;
+mod ron_loader;
+mod rval;
 mod ui;
 mod village;
 mod widgets;
-mod render;
 
 #[allow(unused)]
 pub mod prelude {
@@ -20,6 +23,9 @@ pub mod prelude {
     pub use super::assets::*;
     pub use super::flow::prelude::*;
     pub use super::items::prelude::*;
+    pub use super::render::prelude::*;
+    pub use super::ron_loader::*;
+    pub use super::rval::prelude::*;
     pub use super::ui::prelude::*;
     pub use super::village::prelude::*;
     pub use super::widgets::prelude::*;
@@ -50,7 +56,7 @@ fn main() {
             app_state::GameStatePlugin,
             flow::GameFlowPlugin,
             village::VillagePlugin,
-            items::InventoryPlugin,
+            items::ItemPlugin,
             render::RenderPlugin,
         ))
         .run();

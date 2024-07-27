@@ -1,0 +1,12 @@
+(
+    name: "Vodka distillation",
+    description: "distilling fermented potatos",
+    interval: Step(1),
+    workforce: 1,
+    quantity: 1,
+    inputs: [(
+		quantity: 3,
+		item: "items/potato.item.ron"
+	)],
+    output: "items/vodka.item.ron",
+)

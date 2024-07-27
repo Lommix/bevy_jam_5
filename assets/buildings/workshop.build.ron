@@ -1,0 +1,7 @@
+(
+    name: "Workshop",
+    description: "A Workshop for crafting",
+    sprite: "raw/workshop.aseprite",
+    build_time: 3,
+    produces: ["orders/vodka.work.ron"],
+)

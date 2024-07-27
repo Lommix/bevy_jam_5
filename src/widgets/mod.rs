@@ -1,23 +1,30 @@
 use bevy::prelude::*;
 
 mod aseprite;
+mod build_panel;
 mod button;
 mod button_item;
 mod dialog;
 mod div;
+mod inventory_panel;
 mod panel;
 mod text;
 mod village_hud;
+mod tile_info;
 
 #[allow(unused)]
 pub mod prelude {
     pub use super::aseprite::AsepriteExt;
+    pub use super::build_panel::{BuildPanel, BuildPanelExt};
     pub use super::button::{
         ButtonClicked, ButtonWidget, ButtonWidgetExt,
     };
     pub use super::button_item::*;
     pub use super::dialog::{DialogClosed, DialogExt, DialogWidget};
     pub use super::div::{DivCenteredExt, DivExt};
+    pub use super::inventory_panel::{
+        InventoryPanelExt, InventoryPanelWidget,
+    };
     pub use super::panel::{
         Panel, PanelClosed, PanelConfig, PanelExt,
     };
@@ -34,6 +41,8 @@ impl Plugin for UiPlugin {
             button::ButtonWidgetPlugin,
             village_hud::VillageHudPlugin,
             dialog::DialogWidgetPlugin,
+            build_panel::BuildPanelPlugin,
+            inventory_panel::InventoryPanelPlugin,
         ));
     }
 }

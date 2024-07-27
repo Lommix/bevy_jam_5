@@ -17,11 +17,24 @@ impl Plugin for VillageTileamap {
         app.add_event::<TileClickEvent>();
         app.add_systems(OnEnter(AppState::Playing), spawn_map);
         app.add_systems(Update, switch_season_animation);
+        app.observe(highlight_tile);
         app.add_systems(
             Update,
             check_clicked.run_if(in_state(ControlFlow::PlayerTurn)),
         );
     }
+}
+
+fn highlight_tile(
+    trigger: Trigger<TileClickEvent>,
+    mut cmd: Commands,
+    children: Query<&Children>,
+    highlighted: Query<Entity, With<Highlight>>,
+) {
+    highlighted.iter().for_each(|ent| {
+        cmd.entity(ent).remove::<Highlight>();
+    });
+    cmd.rec_insert::<Highlight>(trigger.entity(), &children);
 }
 
 #[derive(Event)]
@@ -56,7 +69,7 @@ fn switch_season_animation(
     });
 }
 
-//@todo: touch controll
+//@todo: touch control
 fn check_touch(mut touch_events: EventReader<MouseButtonInput>) {}
 
 fn check_clicked(
@@ -140,15 +153,17 @@ fn spawn_map(mut cmd: Commands, sprites: Res<SpriteAssets>) {
                 .id();
 
             if offset == IVec2::ZERO {
-                cmd.entity(tile).insert(House).with_children(|cmd| {
-                    cmd.spawn(AsepriteAnimationBundle {
-                        aseprite: sprites.house.clone(),
-                        transform: Transform::from_translation(
-                            Vec3::Z,
-                        ),
-                        ..default()
-                    });
-                });
+                cmd.entity(tile).insert(Building).with_children(
+                    |cmd| {
+                        cmd.spawn(AsepriteAnimationBundle {
+                            aseprite: sprites.house.clone(),
+                            transform: Transform::from_translation(
+                                Vec3::Z,
+                            ),
+                            ..default()
+                        });
+                    },
+                );
             }
 
             tiles.insert(offset, tile);

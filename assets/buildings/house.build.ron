@@ -1,0 +1,7 @@
+(
+    name: "House",
+    description: "A Building for 4 Villagers",
+    sprite: "raw/house.aseprite",
+	build_time: 2,
+    produces: [],
+)

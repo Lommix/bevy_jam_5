@@ -6,16 +6,22 @@ pub fn new_game(
     mut cmd: Commands,
     mut flow: ResMut<NextState<ControlFlow>>,
     sprites: Res<SpriteAssets>,
+    items: Res<ItemAssets>,
+    item_assets: Res<Assets<ItemAsset>>,
 ) {
     let Ok(center_ui) = center.get_single() else {
         return;
     };
 
-    let starting_food = cmd.spawn(carrots(10)).id();
-    let starting_food_2 = cmd.spawn(potatos(10)).id();
+    let Some(carrot) = item_assets.get(&items.carrot) else {
+        error!("Items not loaded");
+        return;
+    };
+
+    let starting_food = cmd.spawn_item(carrot, 40).id();
+
     let bag = cmd
-        .spawn_empty()
-        .add_child(starting_food_2)
+        .spawn(Name::new("Player Inventory"))
         .add_child(starting_food)
         .id();
 
@@ -32,16 +38,18 @@ pub fn new_game(
                 },
                 ..default()
             },
+            Name::new("Player"),
             Player,
             StateScoped(AppState::Playing),
         ))
         .id();
 
-    cmd.ui_builder(center_ui).div_centered(|div| {
-        div.style().height(Val::Px(100.));
-        div.village_hud(village_entity, &sprites)
-            .insert(StateScoped(AppState::Playing));
-    });
+    cmd.ui_builder(center_ui)
+        .div_centered(|div| {
+            div.style().height(Val::Px(100.));
+            div.village_hud(village_entity, &sprites);
+        })
+        .insert(StateScoped(AppState::Playing));
 
     flow.set(ControlFlow::News);
 }

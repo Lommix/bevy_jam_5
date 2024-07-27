@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use crate::prelude::*;
 use bevy_aseprite_ultra::prelude::Aseprite;
 use bevy_asset_loader::prelude::*;
 
@@ -18,4 +18,67 @@ pub struct SpriteAssets {
     pub house: Handle<Aseprite>,
     #[asset(path = "raw/field.aseprite")]
     pub field: Handle<Aseprite>,
+    #[asset(path = "raw/workshop.aseprite")]
+    pub workshop: Handle<Aseprite>,
+    #[asset(path = "raw/market.aseprite")]
+    pub market: Handle<Aseprite>,
+    #[asset(path = "raw/construct.aseprite")]
+    pub construct: Handle<Aseprite>,
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct ItemAssets {
+    #[asset(path = "items/vodka.item.ron")]
+    pub vodka: Handle<ItemAsset>,
+    #[asset(path = "items/beer.item.ron")]
+    pub beer: Handle<ItemAsset>,
+    #[asset(path = "items/rum.item.ron")]
+    pub rum: Handle<ItemAsset>,
+
+    #[asset(path = "items/carrot.item.ron")]
+    pub carrot: Handle<ItemAsset>,
+    #[asset(path = "items/wheat.item.ron")]
+    pub wheat: Handle<ItemAsset>,
+    #[asset(path = "items/grape.item.ron")]
+    pub grape: Handle<ItemAsset>,
+    #[asset(path = "items/potato.item.ron")]
+    pub potato: Handle<ItemAsset>,
+    #[asset(path = "items/sugarcane.item.ron")]
+    pub sugarcane: Handle<ItemAsset>,
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct WorkOrderAssets {
+    #[asset(path = "orders/vodka.work.ron")]
+    pub distill_vodka: Handle<WorkOrder>,
+    #[asset(path = "orders/potatos.work.ron")]
+    pub grow_potatos: Handle<WorkOrder>,
+    #[asset(path = "orders/carrots.work.ron")]
+    pub grow_carrots: Handle<WorkOrder>,
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct BuildingAssets {
+    #[asset(path = "buildings/house.build.ron")]
+    pub house: Handle<BuildingAsset>,
+    #[asset(path = "buildings/field.build.ron")]
+    pub field: Handle<BuildingAsset>,
+    #[asset(path = "buildings/market.build.ron")]
+    pub market: Handle<BuildingAsset>,
+    #[asset(path = "buildings/workshop.build.ron")]
+    pub workshop: Handle<BuildingAsset>,
+}
+
+impl BuildingAssets {
+    pub fn iter(
+        &self,
+    ) -> impl Iterator<Item = Handle<BuildingAsset>> {
+        vec![
+            self.house.clone(),
+            self.field.clone(),
+            self.market.clone(),
+            self.workshop.clone(),
+        ]
+        .into_iter()
+    }
 }

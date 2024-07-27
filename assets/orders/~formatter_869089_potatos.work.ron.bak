@@ -1,0 +1,14 @@
+(
+    name: "Grow Potatos",
+    description: "planted in spring, harvested in autum, yields enough for 3 villagers/year",
+    interval: Seasons([Autum]),
+    workforce: 1,
+    quantity: 10,
+    inputs: [],
+    outputs: [
+        (
+            quantity: 10,
+            item: "items/potato.item.ron",
+        ),
+    ],
+)

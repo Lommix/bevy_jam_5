@@ -1,0 +1,14 @@
+(
+    name: "Grow Carrots",
+    description: "planted in spring, harvested in autum, yields enough for 3 villagers/year",
+    interval: Step(1),
+    workforce: 1,
+    quantity: 40,
+    inputs: [],
+    outputs: [
+        (
+            quantity: 10,
+            item: "items/carrot.item.ron",
+        ),
+    ],
+)

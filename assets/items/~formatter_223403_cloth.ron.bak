@@ -1,0 +1,10 @@
+(
+    item: (
+        name: "Winter Cloths",
+        description: "Reduces the the risk of freezing",
+        icon: "potato",
+    ),
+    value: (10.0),
+    rarity: Common,
+    tags: [Sellable],
+)

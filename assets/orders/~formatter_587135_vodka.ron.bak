@@ -1,0 +1,7 @@
+(
+	interval: 3,
+	worfoce: 1,
+	quantity: 1,
+	inputs: ["item/potato.ron"],
+	output: ["item/vodka.ron"],
+)

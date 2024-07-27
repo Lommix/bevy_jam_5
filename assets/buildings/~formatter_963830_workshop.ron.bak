@@ -1,0 +1,6 @@
+(
+    name: "Workshop",
+    description: "A Workshop for crafting",
+    sprite: "raw/house.aseprite",
+    produces: [],
+)

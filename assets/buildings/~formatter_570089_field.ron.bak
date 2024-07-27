@@ -1,0 +1,6 @@
+(
+    name: "Field",
+    description: "A Field for crops",
+    sprite: "raw/field.aseprite",
+    produces: [],
+)

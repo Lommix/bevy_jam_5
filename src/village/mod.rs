@@ -1,17 +1,16 @@
 pub use crate::prelude::*;
 pub use bevy::prelude::*;
 
+mod build;
 mod death;
-mod food_cost;
-mod house;
+mod food;
 mod map;
-mod plant;
-mod workorder;
+mod work;
 
 pub mod prelude {
-    pub use super::house::House;
+    pub use super::build::{Building, BuildingAsset, BuildingBundle};
     pub use super::map::prelude::*;
-    pub use super::workorder::prelude::*;
+    pub use super::work::prelude::*;
     pub use super::{Village, VillageBundle};
 }
 
@@ -19,10 +18,10 @@ pub struct VillagePlugin;
 impl Plugin for VillagePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
-            food_cost::FoodCostPlugin,
+            food::FoodCostPlugin,
             map::VillageTileamap,
-            plant::PlantPlugin,
-            workorder::WorkOrderPlugin,
+            build::BuildPlugin,
+            work::WorkOrderPlugin,
         ));
     }
 }

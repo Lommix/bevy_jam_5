@@ -1,6 +1,12 @@
-# Bevy Game Jam 5
+# Beveragy Tycoon mini
+
+### Bevy Game Jam 5
 
 [WIP]
+
+## Sprites
+
+-   R lommix
 
 ## Used Assets
 

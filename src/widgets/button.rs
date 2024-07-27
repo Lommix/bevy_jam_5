@@ -43,14 +43,14 @@ impl ButtonWidget {
             .display(Display::Flex)
             .justify_content(JustifyContent::Center)
             .align_items(AlignItems::Center)
-            .background_color(theme_data.colors().primary)
-            .border_color(theme_data.colors().tertiary)
+            .background_color(COLOR_SECONDARY)
+            .border_color(COLOR_SECONDARY)
             .padding(UiRect::axes(Val::Px(2.), Val::Px(2.)))
-            .border_radius(BorderRadius::all(Val::Px(10.)))
+            .border_radius(BorderRadius::all(Val::Px(5.)))
             .animated()
-            .border_radius(AnimatedVals {
-                idle: BorderRadius::all(Val::Px(10.)),
-                hover: Some(BorderRadius::all(Val::Px(20.))),
+            .border_color(AnimatedVals {
+                idle: COLOR_SECONDARY,
+                hover: Some(COLOR_ACCENT),
                 ..default()
             })
             .copy_from(theme_data.interaction_animation);

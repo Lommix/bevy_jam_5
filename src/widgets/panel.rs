@@ -4,7 +4,6 @@ use sickle_ui::prelude::*;
 pub struct PanelWidgetPlugin;
 impl Plugin for PanelWidgetPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(ComponentThemePlugin::<Panel>::default());
         app.add_event::<PanelClosed>();
     }
 }
@@ -58,30 +57,6 @@ impl Default for Panel {
     }
 }
 
-impl Panel {
-    fn theme() -> Theme<Panel> {
-        let base_theme =
-            PseudoTheme::deferred(None, Panel::primary_style);
-        Theme::new(vec![base_theme])
-    }
-    pub fn primary_style(
-        style_builder: &mut StyleBuilder,
-        theme: &ThemeData,
-    ) {
-        style_builder
-            .border_color(Color::BLACK)
-            .border(UiRect::all(Val::Px(5.)))
-            .border_radius(BorderRadius::all(Val::Px(10.)))
-            .padding(UiRect::all(Val::Px(20.)));
-    }
-}
-
-impl DefaultTheme for Panel {
-    fn default_theme() -> Option<Theme<Self>> {
-        Panel::theme().into()
-    }
-}
-
 pub trait PanelExt {
     fn panel_bg(
         &mut self,
@@ -97,75 +72,104 @@ impl PanelExt for UiBuilder<'_, Entity> {
         spawn_children: impl FnOnce(&mut UiBuilder<Entity>),
     ) -> UiBuilder<Entity> {
         let mut panel = Panel::default();
-        let mut out = self.container(NodeBundle::default(), |panel_div| {
+        let mut out =
+            self.container(NodeBundle::default(), |panel_div| {
+                panel_div
+                    .insert(Name::new("Panel"))
+                    .style()
+                    .position_type(PositionType::Relative)
+                    .border_color(COLOR_ACCENT)
+                    .background_color(COLOR_PRIMARY)
+                    .border(UiRect::all(Val::Px(5.)))
+                    .border_radius(BorderRadius::all(Val::Px(10.)))
+                    .padding(UiRect::all(Val::Px(20.)));
 
-            panel_div
-                .insert(Name::new("Panel"))
-                .style()
-                .position_type(PositionType::Relative);
+                let panel_id = panel_div.id();
 
-            let panel_id = panel_div.id();
+                // title
+                if let Some(title) = config.title {
+                    panel_div.div_centered(|builder| {
+                        panel.title = builder
+                            .text(title.as_str(), Size::Medium)
+                            .style()
+                            .font_color(COLOR_FONT)
+                            .id();
+                        builder
+                            .style()
+                            .padding(UiRect::all(Val::Px(2.)))
+                            .justify_content(JustifyContent::Center)
+                            .width(Val::Percent(50.))
+                            .top(Val::Px(-16.))
+                            .position_type(PositionType::Absolute)
+                            .align_self(AlignSelf::Center)
+                            .height(Val::Px(30.))
+                            .border_color(COLOR_ACCENT)
+                            .border_radius(BorderRadius::all(
+                                Val::Px(5.),
+                            ))
+                            .border(UiRect::all(Val::Px(2.)))
+                            .background_color(COLOR_ACCENT);
+                    });
+                }
 
+                // close
+                if config.close_button {
+                    panel.close = panel_div
+                        .container(
+                            ButtonBundle::default(),
+                            |builder| {
+                                builder
+                                    .style()
+                                    .position_type(
+                                        PositionType::Absolute,
+                                    )
+                                    .bottom(Val::Px(-15.))
+                                    .align_self(AlignSelf::Center)
+                                    .padding(UiRect::all(Val::Px(2.)))
+                                    .border(UiRect::all(Val::Px(2.)))
+                                    .border_color(COLOR_ACCENT)
+                                    .background_color(COLOR_ACCENT)
+                                    .border_radius(
+                                        BorderRadius::all(Val::Px(
+                                            5.,
+                                        )),
+                                    );
 
-            // title
-            if let Some(title) = config.title {
-                panel_div.div_centered(|builder| {
-                    panel.title = builder
-                        .text(title.as_str(), Size::Medium)
-                        .style()
-                        .font_color(Color::WHITE)
-                        .id();
-                    builder.style()
-                        .padding(UiRect::all(Val::Px(2.)))
-                        .justify_content(
-                            JustifyContent::Center,
+                                builder
+                                    .text("close", Size::Small)
+                                    .style()
+                                    .font_color(COLOR_FONT);
+
+                                builder
+                                    .insert(CloseButton(panel_id))
+                                    .entity_commands()
+                                    .observe(on_panel_close);
+                            },
                         )
-                        .width(Val::Percent(50.))
-                        .top(Val::Px(-16.))
-                        .position_type(PositionType::Absolute)
-                        .align_self(AlignSelf::Center)
-                        .height(Val::Px(30.))
-                        .border_color(Color::BLACK)
-                        .border_radius(BorderRadius::all(
-                            Val::Px(5.),
-                        ))
-                        .border(UiRect::all(Val::Px(2.)))
-                        .background_color(Color::BLACK);
-                });
-            }
+                        .id();
+                }
 
-            // close
-            if config.close_button {
-                panel.close = panel_div.container(ButtonBundle::default(),|builder| {
-
-                    builder.style()
-                        .position_type(PositionType::Absolute)
-                        .bottom(Val::Px(-15.))
-                        .align_self(AlignSelf::Center)
-                        .padding(UiRect::all(Val::Px(2.)))
-                        .border(UiRect::all(Val::Px(2.)))
-                        .border_color(Color::BLACK)
-                        .background_color(Color::BLACK)
-                        .border_radius(BorderRadius::all(Val::Px(5.)));
-
-                    builder
-                        .text("close", Size::Small)
-                        .style()
-                        .font_color(Color::WHITE);
-
-                    builder.entity_commands()
-                        .observe( move |_trigger: Trigger<ButtonClicked>,
-                            mut cmd: Commands| {
-                                cmd.trigger_targets(PanelClosed, panel_id);
-                                cmd.entity(panel_id).despawn_recursive();
-                            });
-                }).id();
-            }
-
-            spawn_children(panel_div)
-        });
+                spawn_children(panel_div)
+            });
 
         out.insert(panel);
         out
     }
+}
+
+#[derive(Component, Deref)]
+pub struct CloseButton(pub Entity);
+
+fn on_panel_close(
+    trigger: Trigger<ButtonClicked>,
+    close_targets: Query<&CloseButton>,
+    mut cmd: Commands,
+) {
+    let Ok(target) = close_targets.get(trigger.entity()) else {
+        return;
+    };
+
+    cmd.trigger(ClearHighlights);
+    cmd.trigger_targets(PanelClosed, **target);
+    cmd.entity(**target).despawn_recursive();
 }

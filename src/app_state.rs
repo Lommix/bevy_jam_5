@@ -20,8 +20,19 @@ impl Plugin for GameStatePlugin {
             .add_loading_state(
                 LoadingState::new(AppState::Startup)
                     .continue_to_state(AppState::Menu)
+                    .load_collection::<ItemAssets>()
                     .load_collection::<SpriteAssets>()
-                    .load_collection::<AudioAssets>(),
+                    .load_collection::<AudioAssets>()
+                    .load_collection::<BuildingAssets>()
+                    .load_collection::<WorkOrderAssets>(),
             );
     }
+}
+
+
+fn test(
+    mut handle: Local<Handle<WorkOrder>>,
+    server: Res<AssetServer>
+){
+    *handle = server.load("orders/grow_potatos.ron");
 }

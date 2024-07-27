@@ -48,44 +48,28 @@ pub(crate) fn spawn_menu(mut cmd: Commands) {
                 .justify_content(JustifyContent::Center)
                 .align_items(AlignItems::Center);
 
-            root.panel_bg(
-                PanelConfig::title("Menu").with_close(),
-                |container| {
-                    container
-                        .style()
-                        .flex_direction(FlexDirection::Column)
-                        .row_gap(Val::Px(5.));
+            root.panel_bg(PanelConfig::title("Menu"), |container| {
+                container
+                    .style()
+                    .flex_direction(FlexDirection::Column)
+                    .row_gap(Val::Px(5.));
 
-                    container
-                        .button(|builder| {
-                            builder.text("Play Game", Size::Large);
-                        })
-                        .style()
-                        .width(Val::Percent(100.))
-                        .entity_commands()
-                        .observe(start_game);
+                container
+                    .button(|builder| {
+                        builder.text("Play Game", Size::Large);
+                    })
+                    .style()
+                    .width(Val::Percent(100.))
+                    .entity_commands()
+                    .observe(start_game);
 
-                    container
-                        .button(|builder| {
-                            builder.text("Setttings", Size::Large);
-                        })
-                        .style()
-                        .width(Val::Percent(100.))
-                        .entity_commands()
-                        .observe(
-                            |_trigger: Trigger<ButtonClicked>| {
-                                info!("settings?");
-                            },
-                        );
-
-                    container
-                        .button(|builder| {
-                            builder.text("Credits", Size::Large);
-                        })
-                        .style()
-                        .width(Val::Percent(100.));
-                },
-            );
+                container
+                    .button(|builder| {
+                        builder.text("Credits", Size::Large);
+                    })
+                    .style()
+                    .width(Val::Percent(100.));
+            });
         })
         .insert(StateScoped(AppState::Menu));
 }

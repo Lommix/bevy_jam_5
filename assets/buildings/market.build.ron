@@ -1,0 +1,7 @@
+(
+    name: "Market",
+    description: "A Market for selling and buying",
+    sprite: "raw/market.aseprite",
+    build_time: 2,
+    produces: [],
+)

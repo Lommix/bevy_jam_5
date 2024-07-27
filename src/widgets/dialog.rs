@@ -9,7 +9,17 @@ impl Plugin for DialogWidgetPlugin {
 }
 
 #[derive(Component)]
-pub struct DialogWidget;
+pub struct DialogWidget {
+    text: Entity,
+}
+
+impl Default for DialogWidget {
+    fn default() -> Self {
+        Self {
+            text: Entity::PLACEHOLDER,
+        }
+    }
+}
 
 #[derive(Event)]
 pub struct DialogClosed;
@@ -20,30 +30,34 @@ pub trait DialogExt {
 
 impl DialogExt for UiBuilder<'_, Entity> {
     fn dialog(&mut self, text: &str) -> UiBuilder<Entity> {
-        let mut dialog_id = Entity::PLACEHOLDER;
+        let mut widget = DialogWidget::default();
+        let mut out = self.panel_bg(
+            PanelConfig::default().with_close(),
+            |panel| {
+                panel
+                    .style()
+                    .min_width(Val::Px(400.))
+                    .min_height(Val::Px(100.));
 
-        self.panel_bg(PanelConfig::default().with_close(), |panel| {
-            panel
-                .style()
-                .min_width(Val::Px(400.))
-                .min_height(Val::Px(100.))
-                .background_color(COLOR_PRIMARY)
-                .border_color(COLOR_TER);
+                panel.entity_commands().observe(
+                    move |trigger: Trigger<PanelClosed>,
+                          mut cmd: Commands| {
+                        cmd.trigger_targets(
+                            DialogClosed,
+                            trigger.entity(),
+                        )
+                    },
+                );
 
-            panel.entity_commands().observe(
-                move |trigger: Trigger<PanelClosed>,
-                      mut cmd: Commands| {
-                    cmd.trigger_targets(
-                        DialogClosed,
-                        trigger.entity(),
-                    )
-                },
-            );
+                widget.text = panel
+                    .text(text, Size::Small)
+                    .style()
+                    .font_color(COLOR_FONT)
+                    .id();
+            },
+        );
 
-            panel
-                .text(text, Size::Small)
-                .style()
-                .font_color(COLOR_FONT);
-        })
+        out.insert(widget);
+        out
     }
 }

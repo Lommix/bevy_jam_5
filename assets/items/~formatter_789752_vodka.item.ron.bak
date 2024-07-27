@@ -1,0 +1,10 @@
+(
+    item: (
+        name: "Zaarberger Vodka",
+        description: "A strong alcoholic drink from distilled wheat",
+        icon: "potato",
+    ),
+    value: (20.49),
+    rarity: Rare,
+    tags: [Sellable],
+)

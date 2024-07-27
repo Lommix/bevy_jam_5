@@ -21,11 +21,11 @@ fn drain_food(
     village.iter_mut().for_each(|(mut village, inventory)| {
         let mut to_feed = village.villager_count;
 
-        let Ok(bag) = bag.get(inventory.bag) else {
+        let Ok(inventory_content) = bag.get(inventory.bag) else {
             return;
         };
 
-        for item_ent in bag.iter() {
+        for item_ent in inventory_content.iter() {
             if to_feed == 0 {
                 break;
             }
@@ -34,8 +34,8 @@ fn drain_food(
                 continue;
             };
 
-            let new_quant = **quant - village.villager_count;
-            to_feed -= new_quant.max(0);
+            let new_quant = **quant - to_feed;
+            to_feed = new_quant.min(0).abs();
 
             if new_quant < 0 {
                 cmd.entity(*item_ent).despawn_recursive();

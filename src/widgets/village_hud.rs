@@ -49,9 +49,12 @@ fn update_hud(
                 vec![format!("{} Gold", inventory.gold).into()];
         });
         _ = texts.get_mut(hud.villager_count_txt).map(|mut txt| {
-            txt.sections =
-                vec![format!("{} Villager", village.villager_count)
-                    .into()];
+            txt.sections = vec![format!(
+                "{}/{} Villager",
+                village.villager_count - village.villager_busy,
+                village.villager_count
+            )
+            .into()];
         });
     });
 }

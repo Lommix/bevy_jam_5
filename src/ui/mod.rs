@@ -1,17 +1,19 @@
 use crate::prelude::*;
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use sickle_ui::{
     prelude::*,
     theme::theme_colors::{CoreColors, ThemeColors},
 };
 
 mod colors;
+mod cursor;
 mod menu;
 mod overlay;
 
 #[allow(unused)]
 pub mod prelude {
     pub use super::colors::*;
+    pub use super::cursor::prelude::*;
     pub use super::overlay::OverlayState;
     pub use super::{
         BottomUi, CenterLeftUi, CenterMiddleUi, CenterRightUi,
@@ -24,6 +26,7 @@ impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
             menu::GameMenuPlugin,
+            cursor::CursorPlugin,
             overlay::OverlayPlugin,
         ))
         .add_systems(OnEnter(AppState::Startup), startup);
@@ -65,10 +68,21 @@ pub struct CenterRightUi;
 pub struct BottomUi;
 
 fn startup(mut cmd: Commands, mut theme_data: ResMut<ThemeData>) {
-    cmd.spawn(Camera2dBundle {
-        transform: Transform::from_scale(Vec3::splat(0.80)),
-        ..default()
-    });
+    cmd.spawn((
+        Camera2dBundle {
+            transform: Transform::from_scale(Vec3::splat(0.80)),
+            camera: Camera {
+                // clear_color: ClearColorConfig::Custom(Color::NONE),
+                order: 1,
+                ..default()
+            },
+            ..default()
+        },
+        HighlightSettings {
+            glow_border_thickness: 10.,
+        },
+        RenderLayers::layer(0),
+    ));
 
     theme_data.active_scheme = Scheme::Light(Contrast::Standard);
 

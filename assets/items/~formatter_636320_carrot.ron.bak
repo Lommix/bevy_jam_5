@@ -1,0 +1,10 @@
+(
+    item: (
+        name: "Carrot",
+        description: "A healthy and crunchy vegetable, rich in vitamins.",
+        icon: "carrot_icon.png",
+    ),
+    value: (2.5), // Assuming the value is in gold and carrots are cheap
+    rarity: Common, // Assuming carrots are a common item
+    tags: ["vegetable", "food", "health"],
+)

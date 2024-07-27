@@ -15,15 +15,21 @@ impl Plugin for NewsPlugin {
     }
 }
 
-#[derive(Component)]
-pub struct News {
-    pub news: VecDeque<String>,
+#[derive(Event)]
+pub struct NewsEvent {
+    pub message: String,
+}
+
+fn show_news(
+    mut cmd: Commands,
+    server: Res<AssetServer>,
+    window: Query<&Window>,
+) {
 }
 
 fn start_news(
     mut cmd: Commands,
-    server: Res<AssetServer>,
-    village: Query<(&Village, &GameContext, &News), With<Player>>,
+    // village: Query<(&Village, &GameContext), With<Player>>,
     ui_query: Query<Entity, With<BottomUi>>,
 ) {
     info!("starting news!");

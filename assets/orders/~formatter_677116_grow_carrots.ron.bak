@@ -1,0 +1,9 @@
+(
+    name: "Grow Carrots",
+    description: "Seeded in Spring, harvested in autum",
+    interval: 0,
+    worfoce: 1,
+    quantity: 10,
+    inputs: [],
+    output: ["item/carrot.ron"],
+)
