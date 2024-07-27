@@ -82,7 +82,10 @@ impl PanelExt for UiBuilder<'_, Entity> {
                     .background_color(COLOR_PRIMARY)
                     .border(UiRect::all(Val::Px(5.)))
                     .border_radius(BorderRadius::all(Val::Px(10.)))
-                    .padding(UiRect::all(Val::Px(20.)));
+                    .padding(UiRect::axes(
+                        Val::Px(20.),
+                        Val::Px(35.),
+                    ));
 
                 let panel_id = panel_div.id();
 
@@ -107,46 +110,56 @@ impl PanelExt for UiBuilder<'_, Entity> {
                             .border_radius(BorderRadius::all(
                                 Val::Px(5.),
                             ))
-                            .border(UiRect::all(Val::Px(2.)))
+                            .border(UiRect::all(Val::Px(5.)))
                             .background_color(COLOR_ACCENT);
                     });
                 }
 
                 // close
                 if config.close_button {
-                    panel.close = panel_div
-                        .container(
-                            ButtonBundle::default(),
-                            |builder| {
-                                builder
-                                    .style()
-                                    .position_type(
-                                        PositionType::Absolute,
-                                    )
-                                    .bottom(Val::Px(-15.))
-                                    .align_self(AlignSelf::Center)
-                                    .padding(UiRect::all(Val::Px(2.)))
-                                    .border(UiRect::all(Val::Px(2.)))
-                                    .border_color(COLOR_ACCENT)
-                                    .background_color(COLOR_ACCENT)
-                                    .border_radius(
-                                        BorderRadius::all(Val::Px(
-                                            5.,
-                                        )),
-                                    );
+                    panel_div.div(|div| {
+                        div.style()
+                            .bottom(Val::Px(-15.))
+                            .position_type(PositionType::Absolute)
+                            .width(Val::Percent(100.))
+                            .justify_content(JustifyContent::Center)
+                            .left(Val::Px(0.));
 
-                                builder
-                                    .text("close", Size::Small)
-                                    .style()
-                                    .font_color(COLOR_FONT);
+                        panel.close = div
+                            .container(
+                                ButtonBundle::default(),
+                                |builder| {
+                                    builder
+                                        .style()
+                                        .padding(UiRect::all(
+                                            Val::Px(2.),
+                                        ))
+                                        .border(UiRect::all(Val::Px(
+                                            4.,
+                                        )))
+                                        .border_color(COLOR_ACCENT)
+                                        .background_color(
+                                            COLOR_ACCENT,
+                                        )
+                                        .border_radius(
+                                            BorderRadius::all(
+                                                Val::Px(5.),
+                                            ),
+                                        );
 
-                                builder
-                                    .insert(CloseButton(panel_id))
-                                    .entity_commands()
-                                    .observe(on_panel_close);
-                            },
-                        )
-                        .id();
+                                    builder
+                                        .text("X", Size::Medium)
+                                        .style()
+                                        .font_color(COLOR_FONT);
+
+                                    builder
+                                        .insert(CloseButton(panel_id))
+                                        .entity_commands()
+                                        .observe(on_panel_close);
+                                },
+                            )
+                            .id();
+                    });
                 }
 
                 spawn_children(panel_div)

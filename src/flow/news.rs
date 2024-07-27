@@ -4,9 +4,15 @@ use crate::prelude::*;
 use bevy::prelude::*;
 use sickle_ui::prelude::*;
 
+#[allow(unused)]
+pub mod prelude {
+    pub use super::NewsEvent;
+}
+
 pub struct NewsPlugin;
 impl Plugin for NewsPlugin {
     fn build(&self, app: &mut App) {
+        app.add_event::<NewsEvent>();
         app.add_systems(OnEnter(ControlFlow::News), start_news);
         app.add_systems(
             Update,
@@ -30,6 +36,7 @@ fn show_news(
 fn start_news(
     mut cmd: Commands,
     // village: Query<(&Village, &GameContext), With<Player>>,
+    mut events: EventReader<NewsEvent>,
     ui_query: Query<Entity, With<BottomUi>>,
 ) {
     info!("starting news!");

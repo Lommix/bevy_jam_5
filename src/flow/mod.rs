@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use sickle_ui::prelude::*;
 
 mod autoplay;
 mod game_over;
@@ -11,6 +10,7 @@ mod session;
 
 #[allow(unused)]
 pub mod prelude {
+    pub use super::news::prelude::*;
     pub use super::seasons::{
         Season, SeasonPlugin, SeasonShiftEvent,
     };

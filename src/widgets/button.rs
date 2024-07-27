@@ -45,7 +45,7 @@ impl ButtonWidget {
             .align_items(AlignItems::Center)
             .background_color(COLOR_SECONDARY)
             .border_color(COLOR_SECONDARY)
-            .padding(UiRect::axes(Val::Px(2.), Val::Px(2.)))
+            .padding(UiRect::axes(Val::Px(15.), Val::Px(2.)))
             .border_radius(BorderRadius::all(Val::Px(5.)))
             .animated()
             .border_color(AnimatedVals {

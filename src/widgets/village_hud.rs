@@ -174,7 +174,7 @@ impl VillageHudExt for UiBuilder<'_, Entity> {
             })
             .style()
             .position_type(PositionType::Absolute)
-            .bottom(Val::Px(-40.));
+            .bottom(Val::Px(-80.));
         });
 
         out.insert(widget);

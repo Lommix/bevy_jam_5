@@ -24,15 +24,8 @@ impl Plugin for GameStatePlugin {
                     .load_collection::<SpriteAssets>()
                     .load_collection::<AudioAssets>()
                     .load_collection::<BuildingAssets>()
-                    .load_collection::<WorkOrderAssets>(),
+                    .load_collection::<WorkOrderAssets>()
+                    .load_collection::<FontAssets>(),
             );
     }
-}
-
-
-fn test(
-    mut handle: Local<Handle<WorkOrder>>,
-    server: Res<AssetServer>
-){
-    *handle = server.load("orders/grow_potatos.ron");
 }

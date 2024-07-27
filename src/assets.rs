@@ -9,6 +9,12 @@ pub struct AudioAssets {
 }
 
 #[derive(AssetCollection, Resource)]
+pub struct FontAssets {
+    #[asset(path = "big_blue.TTF")]
+    pub font: Handle<Font>,
+}
+
+#[derive(AssetCollection, Resource)]
 pub struct SpriteAssets {
     #[asset(path = "raw/icons.aseprite")]
     pub icons: Handle<Aseprite>,
