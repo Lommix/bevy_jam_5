@@ -50,6 +50,7 @@ fn main() {
             avian2d::PhysicsPlugins::default(),
             WorldInspectorPlugin::default(),
             bevy_aseprite_ultra::BevySprityPlugin,
+            bevy_tweening::TweeningPlugin,
         ))
         .add_plugins((
             widgets::UiPlugin,

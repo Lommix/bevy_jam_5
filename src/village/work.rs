@@ -1,5 +1,11 @@
+use std::time::Duration;
+
 pub use crate::prelude::*;
 use crate::ron_asset_loader;
+use bevy_aseprite_ultra::prelude::*;
+use bevy_tweening::*;
+use lens::{TransformPositionLens, TransformScaleLens};
+
 pub mod prelude {
     pub use super::{
         LoopOrder, TargetInventory, WorkOrder, WorkOrderBundle,
@@ -14,10 +20,11 @@ impl Plugin for WorkOrderPlugin {
             .add_plugins(WorkOrderAssetPlugin)
             .add_event::<WorkOrderFinished>()
             .add_systems(
-                OnExit(ControlFlow::Autoplay),
+                OnEnter(ControlFlow::Autoplay),
                 progress_workorder,
             )
             .observe(finish_workorder)
+            .observe(on_produce_particles)
             .add_systems(Update, update_workforce);
     }
 }
@@ -140,6 +147,8 @@ fn finish_workorder(
     work: Res<Assets<WorkOrder>>,
     items: Res<Assets<ItemAsset>>,
     inventories: Query<&Inventory>,
+    children: Query<&Children>,
+    item_entities: Query<(&Quantity, &Handle<ItemAsset>)>,
 ) {
     let Ok((order_handle, target)) = orders.get(trigger.entity())
     else {
@@ -155,6 +164,14 @@ fn finish_workorder(
         return;
     };
 
+    let Ok(item_iter) =
+        children.get(inventory.bag).map(|children| children.iter())
+    else {
+        return;
+    };
+
+    for input in order.inputs.iter() {}
+
     for output in order.outputs.iter() {
         let Some(item) = items.get(&output.item_handle) else {
             warn!("crafting - missing item");
@@ -165,4 +182,65 @@ fn finish_workorder(
             cmd.spawn_item(item, output.quantity as i32).id();
         cmd.entity(inventory.queue).add_child(item_id);
     }
+}
+
+#[derive(Component)]
+pub struct FloatItem;
+
+fn on_produce_particles(
+    trigger: Trigger<WorkOrderFinished>,
+    mut cmd: Commands,
+    producers: Query<(&GlobalTransform, &Handle<WorkOrder>)>,
+    items: Res<Assets<ItemAsset>>,
+    works: Res<Assets<WorkOrder>>,
+    sprites: Res<SpriteAssets>,
+) {
+    let Ok((postion, order_handle)) =
+        producers.get(trigger.entity()).map(|(t, handle)| {
+            (t.translation().truncate().extend(100.), handle)
+        })
+    else {
+        return;
+    };
+
+    let Some(order) = works.get(order_handle) else {
+        return;
+    };
+
+    let Some(output) = order
+        .outputs
+        .iter()
+        .next()
+        .map(|slot| items.get(&slot.item_handle))
+        .flatten()
+    else {
+        return;
+    };
+
+    let tween = Tween::new(
+        EaseFunction::BounceOut,
+        Duration::from_secs_f32(0.5),
+        TransformScaleLens {
+            start: Vec3::ZERO,
+            end: Vec3::ONE * 2.,
+        },
+    )
+    .then(Tween::new(
+        EaseFunction::QuadraticInOut,
+        Duration::from_secs_f32(0.5),
+        TransformPositionLens {
+            start: postion,
+            end: postion + Vec3::new(0., 60., 0.),
+        },
+    ));
+    cmd.spawn((
+        AsepriteSliceBundle {
+            transform: Transform::from_translation(postion),
+            slice: output.item.icon.as_str().into(),
+            aseprite: sprites.icons.clone(),
+            ..default()
+        },
+        Lifetime::seconds(1.),
+        Animator::new(tween),
+    ));
 }
