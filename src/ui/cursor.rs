@@ -1,15 +1,56 @@
 use crate::prelude::*;
+use bevy::window::PrimaryWindow;
 use bevy_aseprite_ultra::prelude::*;
 
 pub mod prelude {
-    pub use super::Cursor;
+    pub use super::{Cursor, CursorState};
 }
 
 pub struct CursorPlugin;
 impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::Menu), spawn_cursor)
-            .add_systems(Update, update_cursor);
+            .init_state::<CursorState>()
+            .add_systems(
+                First,
+                (update_cursor, update_cursor_state).chain(),
+            );
+    }
+}
+
+#[derive(States, Default, Debug, Clone, Hash, PartialEq, Eq)]
+pub enum CursorState {
+    #[default]
+    Game,
+    Ui,
+}
+
+fn update_cursor_state(
+    mut next_state: ResMut<NextState<CursorState>>,
+    window: Query<&Window, With<PrimaryWindow>>,
+    panels: Query<(&Node, &GlobalTransform), With<Panel>>,
+) {
+    let Some(cursor_pos) = window
+        .get_single()
+        .ok()
+        .map(|w| w.cursor_position())
+        .flatten()
+    else {
+        return;
+    };
+
+    let hover_ui = !panels.iter().all(|(node, transform)| {
+        !collide_aabb(
+            transform.translation().truncate(),
+            node.size() / 2.,
+            cursor_pos,
+        )
+    });
+
+    if hover_ui {
+        next_state.set(CursorState::Ui)
+    } else {
+        next_state.set(CursorState::Game)
     }
 }
 
@@ -29,10 +70,9 @@ fn update_cursor(
     };
 
     if let Some(cursor_pos) = window.cursor_position() {
-
-        let offset =
-            0.8 *
-            (cursor_pos - window.size() / 2.) * Vec2::new(1., -1.);
+        let offset = 0.8
+            * (cursor_pos - window.size() / 2.)
+            * Vec2::new(1., -1.);
 
         transform.translation = offset.extend(100.);
     };

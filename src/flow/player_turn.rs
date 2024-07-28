@@ -5,7 +5,7 @@ pub struct PlayerTurnPlugin;
 impl Plugin for PlayerTurnPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(ControlFlow::PlayerTurn), start_turn);
-        app.observe(open_inventory);
+        app.observe(on_tile_clicked);
     }
 }
 
@@ -23,8 +23,13 @@ fn start_turn(
     cmd.ui_builder(bottom_ui)
         .div_centered(|builder| {
             builder
-                .button(|builder| {
-                    builder.text("End this turn", Size::Large);
+                .button(|button| {
+                    button.style().padding(UiRect::axes(
+                        Val::Px(20.),
+                        Val::Px(10.),
+                    ));
+
+                    button.text("End this turn", Size::Large);
                 })
                 .entity_commands()
                 .observe(end_turn);
@@ -41,23 +46,40 @@ fn end_turn(
     flow.set(ControlFlow::Autoplay);
 }
 
-fn open_inventory(
+#[derive(Component)]
+pub struct ActionCard;
+
+// spawn interaction panel
+fn on_tile_clicked(
     trigger: Trigger<TileClickEvent>,
-    ui: Query<Entity, With<CenterMiddleUi>>,
-    inventory: Query<Entity, With<Player>>,
     mut cmd: Commands,
-    houses: Query<(), With<Building>>,
+    tiles: Query<(Entity, &GlobalTransform), With<Tile>>,
+    open_panels: Query<Entity, With<ActionCard>>,
+    window: Query<&Window>,
 ) {
-    let Ok(ui_root) = ui.get_single() else {
+    let Ok((_, global)) = tiles.get(trigger.entity()) else {
         return;
     };
 
-    let Ok(player) = inventory.get_single() else {
-        return;
-    };
+    open_panels
+        .iter()
+        .for_each(|ent| cmd.entity(ent).despawn_recursive());
 
-    if houses.get(trigger.entity()).is_ok() {
-        info!("house clicked");
-        cmd.ui_builder(ui_root).inventory_panel(player);
-    }
+    let panel_anchor_position = window
+        .get_single()
+        .ok()
+        .map(|win| win.cursor_position())
+        .flatten()
+        .unwrap_or_default()
+        + Vec2::new(20., -50.);
+
+    cmd.ui_builder(UiRoot)
+        .div(|builder| {
+            builder.action_panel(
+                trigger.entity(),
+                panel_anchor_position,
+            );
+        })
+        .insert(ActionCard)
+        .insert(StateScoped(ControlFlow::PlayerTurn));
 }

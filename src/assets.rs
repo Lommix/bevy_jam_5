@@ -26,8 +26,6 @@ pub struct SpriteAssets {
     pub field: Handle<Aseprite>,
     #[asset(path = "raw/workshop.aseprite")]
     pub workshop: Handle<Aseprite>,
-    #[asset(path = "raw/market.aseprite")]
-    pub market: Handle<Aseprite>,
     #[asset(path = "raw/construct.aseprite")]
     pub construct: Handle<Aseprite>,
 }
@@ -41,6 +39,8 @@ pub struct ItemAssets {
     #[asset(path = "items/rum.item.ron")]
     pub rum: Handle<ItemAsset>,
 
+    #[asset(path = "items/corn.item.ron")]
+    pub corn: Handle<ItemAsset>,
     #[asset(path = "items/carrot.item.ron")]
     pub carrot: Handle<ItemAsset>,
     #[asset(path = "items/wheat.item.ron")]
@@ -69,8 +69,6 @@ pub struct BuildingAssets {
     pub house: Handle<BuildingAsset>,
     #[asset(path = "buildings/field.build.ron")]
     pub field: Handle<BuildingAsset>,
-    #[asset(path = "buildings/market.build.ron")]
-    pub market: Handle<BuildingAsset>,
     #[asset(path = "buildings/workshop.build.ron")]
     pub workshop: Handle<BuildingAsset>,
 }
@@ -82,7 +80,6 @@ impl BuildingAssets {
         vec![
             self.house.clone(),
             self.field.clone(),
-            self.market.clone(),
             self.workshop.clone(),
         ]
         .into_iter()

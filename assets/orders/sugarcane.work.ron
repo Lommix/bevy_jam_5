@@ -1,0 +1,13 @@
+(
+    name: "Grow Sugarcane",
+    description: "planted in spring, harvested in autum",
+    interval: Seasons([Autum]),
+    workforce: 1,
+    inputs: [],
+    outputs: [
+        (
+            quantity: 10,
+            item: "items/sugarcane.item.ron",
+        ),
+    ],
+)

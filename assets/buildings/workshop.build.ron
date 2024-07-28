@@ -1,7 +1,13 @@
 (
-    name: "Workshop",
+    name: "Distillery",
     description: "A Workshop for crafting",
     sprite: "raw/workshop.aseprite",
     build_time: 3,
-    produces: ["orders/vodka.work.ron"],
+    produces: [
+        "orders/vodka.work.ron",
+        "orders/rum.work.ron",
+        "orders/wine.work.ron",
+        "orders/beer.work.ron",
+        "orders/double_corn.work.ron",
+    ],
 )

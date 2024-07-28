@@ -8,7 +8,7 @@ mod map;
 mod work;
 
 pub mod prelude {
-    pub use super::build::{Building, BuildingAsset, BuildingBundle};
+    pub use super::build::{BuildingAsset, BuildingBundle};
     pub use super::map::prelude::*;
     pub use super::work::prelude::*;
     pub use super::{Village, VillageBundle};

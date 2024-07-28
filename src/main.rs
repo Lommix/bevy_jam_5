@@ -21,6 +21,7 @@ mod widgets;
 pub mod prelude {
     pub use super::app_state::AppState;
     pub use super::assets::*;
+    pub use super::common::prelude::*;
     pub use super::flow::prelude::*;
     pub use super::items::prelude::*;
     pub use super::render::prelude::*;
@@ -58,6 +59,7 @@ fn main() {
             village::VillagePlugin,
             items::ItemPlugin,
             render::RenderPlugin,
+            common::CommonPlugin,
         ))
         .run();
 }

@@ -13,7 +13,10 @@ impl Plugin for InventoryPanelPlugin {
 
 fn render_inventory(
     mut cmd: Commands,
-    widgets: Query<(Entity, &InventoryPanelWidget), Added<InventoryPanelWidget>>,
+    widgets: Query<
+        (Entity, &InventoryPanelWidget),
+        Added<InventoryPanelWidget>,
+    >,
     inventories: Query<&Inventory>,
     children: Query<&Children>,
     items: Query<(&Item, &Quantity)>,
@@ -33,10 +36,27 @@ fn render_inventory(
                 continue;
             };
 
-            cmd.ui_builder(widget_ent).button_item(
-                assets.icons.clone(),
-                &item.icon,
-                &format!("{} {}", **quant, &item.name),
+            cmd.ui_builder(widget_ent).container(
+                NodeBundle::default(),
+                |div| {
+                    div.style()
+                        .justify_content(JustifyContent::Start)
+                        .column_gap(Val::Px(5.))
+                        .align_items(AlignItems::Center)
+                        .width(Val::Percent(100.));
+
+                    div.text(&format!("{}x", **quant), Size::Small);
+                    div.ase_image(
+                        assets.icons.clone(),
+                        &item.icon,
+                        |_| {},
+                    )
+                    .style()
+                    .height(Val::Px(16.))
+                    .width(Val::Px(16.));
+
+                    div.text(&format!("{}", item.name), Size::Small);
+                },
             );
         }
     }
@@ -67,6 +87,7 @@ impl InventoryPanelExt for UiBuilder<'_, Entity> {
                 panel
                     .style()
                     .flex_direction(FlexDirection::Column)
+                    .min_width(Val::Px(300.))
                     .column_gap(Val::Px(5.));
 
                 panel.insert(InventoryPanelWidget { inventory });

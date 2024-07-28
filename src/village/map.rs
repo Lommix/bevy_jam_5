@@ -8,7 +8,9 @@ use bevy_aseprite_ultra::prelude::*;
 
 #[allow(unused)]
 pub mod prelude {
-    pub use super::{Tile, TileClickEvent, VillageTileamap};
+    pub use super::{
+        collide_aabb, Tile, TileClickEvent, VillageTileamap,
+    };
 }
 
 pub struct VillageTileamap;
@@ -70,12 +72,13 @@ fn switch_season_animation(
 }
 
 //@todo: touch control
-fn check_touch(mut touch_events: EventReader<MouseButtonInput>) {}
+fn check_touched(mut touch_events: EventReader<MouseButtonInput>) {}
 
 fn check_clicked(
     mut cmd: Commands,
-    mut events: EventReader<MouseButtonInput>,
-    window: Query<&Window, With<PrimaryWindow>>,
+    inputs: Res<ButtonInput<MouseButton>>,
+    cursor_state: Res<State<CursorState>>,
+    crusor_query: Query<&GlobalTransform, With<Cursor>>,
     map: Query<&TileMap>,
     tiles: Query<(Entity, &GlobalTransform), With<Tile>>,
 ) {
@@ -83,45 +86,39 @@ fn check_clicked(
         return;
     };
 
-    events.read().for_each(|event| {
-        if matches!(event.state, ButtonState::Pressed) {
-            return;
-        };
+    if !inputs.just_pressed(MouseButton::Left) {
+        return;
+    };
 
-        let Ok(window) = window.get(event.window) else {
-            return;
-        };
+    if matches!(cursor_state.get(), CursorState::Ui) {
+        return;
+    }
 
-        let Some(click_position) =
-            window.cursor_position().map(|pos| {
-                (pos - window.size() / 2.) * Vec2::new(1., -1.)
-            })
-        else {
-            return;
-        };
+    let Ok(global) = crusor_query.get_single() else {
+        return;
+    };
 
-        let Some((entity, position)) = tiles
-            .iter()
-            .map(|(ent, global)| {
-                (ent, global.translation().truncate())
-            })
-            .filter(|(_, pos)| {
-                collide_aabb(
-                    *pos,
-                    tile_map.tile_size / 2.,
-                    click_position,
-                )
-            })
-            .next()
-        else {
-            return;
-        };
+    let click_position = global.translation().truncate();
 
-        cmd.trigger_targets(TileClickEvent, entity);
-    });
+    let Some((entity, _)) = tiles
+        .iter()
+        .map(|(ent, global)| (ent, global.translation().truncate()))
+        .filter(|(_, pos)| {
+            collide_aabb(
+                *pos,
+                tile_map.tile_size / 2.,
+                click_position,
+            )
+        })
+        .next()
+    else {
+        return;
+    };
+
+    cmd.trigger_targets(TileClickEvent, entity);
 }
 
-fn collide_aabb(center: Vec2, half: Vec2, probe: Vec2) -> bool {
+pub fn collide_aabb(center: Vec2, half: Vec2, probe: Vec2) -> bool {
     let inside_x = probe.x >= (center.x - half.x)
         && probe.x <= (center.x + half.x);
     let inside_y = probe.y >= (center.y - half.y)
@@ -129,7 +126,11 @@ fn collide_aabb(center: Vec2, half: Vec2, probe: Vec2) -> bool {
     inside_x && inside_y
 }
 
-fn spawn_map(mut cmd: Commands, sprites: Res<SpriteAssets>) {
+fn spawn_map(
+    mut cmd: Commands,
+    sprites: Res<SpriteAssets>,
+    buildings: Res<BuildingAssets>,
+) {
     let gap = Vec2::new(1., 1.);
     let tile_size = Vec2::new(64., 64.);
     let mut tiles = HashMap::new();
@@ -153,17 +154,14 @@ fn spawn_map(mut cmd: Commands, sprites: Res<SpriteAssets>) {
                 .id();
 
             if offset == IVec2::ZERO {
-                cmd.entity(tile).insert(Building).with_children(
-                    |cmd| {
-                        cmd.spawn(AsepriteAnimationBundle {
-                            aseprite: sprites.house.clone(),
-                            transform: Transform::from_translation(
-                                Vec3::Z,
-                            ),
-                            ..default()
-                        });
-                    },
-                );
+                let building = cmd
+                    .spawn(BuildingBundle {
+                        building: buildings.house.clone(),
+                        ..default()
+                    })
+                    .id();
+
+                cmd.entity(tile).add_child(building);
             }
 
             tiles.insert(offset, tile);

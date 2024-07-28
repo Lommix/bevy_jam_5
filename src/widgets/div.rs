@@ -20,7 +20,14 @@ impl DivExt for UiBuilder<'_, UiRoot> {
         &mut self,
         spawn_children: impl FnOnce(&mut UiBuilder<Entity>),
     ) -> UiBuilder<Entity> {
-        self.container(NodeBundle::default(), spawn_children)
+        self.container(NodeBundle::default(), |builder| {
+            builder
+                .style()
+                .width(Val::Percent(100.))
+                .height(Val::Percent(100.));
+
+            spawn_children(builder);
+        })
     }
 }
 

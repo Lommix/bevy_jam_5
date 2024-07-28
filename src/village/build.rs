@@ -1,8 +1,6 @@
 use crate::{prelude::*, ron_asset_loader};
-use bevy::render::view::RenderLayers;
 use bevy_aseprite_ultra::prelude::*;
 use serde::{Deserialize, Serialize};
-use sickle_ui::prelude::*;
 
 pub struct BuildPlugin;
 impl Plugin for BuildPlugin {
@@ -17,8 +15,7 @@ impl Plugin for BuildPlugin {
                 start_producing,
             )
                 .in_set(GameSysSets::InGame),
-        )
-        .observe(spawn_build_menu);
+        );
 
         app.add_systems(
             OnExit(ControlFlow::Autoplay),
@@ -35,9 +32,6 @@ ron_asset_loader!(
     sprite -> sprite_handle
     =produces -> produce_handles
 );
-
-#[derive(Component)]
-pub struct Building;
 
 #[derive(Component, Deref, DerefMut)]
 pub struct BuildProgress(u32);
@@ -67,49 +61,6 @@ pub struct BuildingAsset {
 
     #[serde(skip)]
     pub produce_handles: Vec<Handle<WorkOrder>>,
-}
-
-#[derive(Component)]
-pub struct BuildOrderPanel;
-
-fn spawn_build_menu(
-    trigger: Trigger<TileClickEvent>,
-    mut cmd: Commands,
-    tiles: Query<
-        (Entity, &GlobalTransform),
-        (With<Tile>, Without<Children>),
-    >,
-    window: Query<&Window>,
-    center_ui: Query<Entity, With<CenterRightUi>>,
-    open_panels: Query<Entity, With<BuildOrderPanel>>,
-    children: Query<&Children>,
-) {
-    let Ok(center) = center_ui.get_single() else {
-        return;
-    };
-
-    let Ok((_, global)) = tiles.get(trigger.entity()) else {
-        return;
-    };
-
-    open_panels
-        .iter()
-        .for_each(|ent| cmd.entity(ent).despawn_recursive());
-
-    let pos = window
-        .get_single()
-        .ok()
-        .map(|win| win.cursor_position())
-        .flatten()
-        .unwrap_or_default()
-        + Vec2::new(20., -50.);
-
-    cmd.ui_builder(UiRoot)
-        .div(|builder| {
-            builder.build_panel(trigger.entity(), pos);
-        })
-        .insert(BuildOrderPanel)
-        .insert(StateScoped(ControlFlow::PlayerTurn));
 }
 
 fn switch_season_animation(
@@ -211,8 +162,6 @@ fn start_producing(
         let Some(handle) = building.produce_handles.first() else {
             return;
         };
-
-        info!("starting work order");
 
         cmd.entity(entity).insert((
             WorkOrderBundle {

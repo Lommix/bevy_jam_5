@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+mod action_panel;
 mod aseprite;
 mod build_panel;
 mod button;
@@ -14,6 +15,7 @@ mod village_hud;
 
 #[allow(unused)]
 pub mod prelude {
+    pub use super::action_panel::prelude::*;
     pub use super::aseprite::AsepriteExt;
     pub use super::build_panel::{BuildPanel, BuildPanelExt};
     pub use super::button::{
@@ -46,6 +48,7 @@ impl Plugin for UiPlugin {
             inventory_panel::InventoryPanelPlugin,
             tile_info::TileInfoPanelPlugin,
             text::TextPlugin,
+            action_panel::ActionPanelPlugin,
         ));
     }
 }

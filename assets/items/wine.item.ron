@@ -1,0 +1,10 @@
+(
+    item: (
+        name: "Wine",
+        description: "A alcoholic drink from fermented grapes",
+        icon: "wine",
+    ),
+    value: (20.49),
+    rarity: Rare,
+    tags: [Sellable],
+)

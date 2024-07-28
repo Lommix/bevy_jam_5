@@ -1,6 +1,6 @@
 (
-    name: "Vodka distillation",
-    description: "distilling fermented wheat",
+    name: "Beer brewing",
+    description: "brewing beer from wheat",
     interval: Step(1),
     workforce: 1,
     inputs: [
@@ -12,7 +12,7 @@
     outputs: [
         (
             quantity: 1,
-            item: "items/vodka.item.ron",
+            item: "items/beer.item.ron",
         ),
     ],
 )

@@ -1,18 +1,18 @@
 (
-    name: "Vodka distillation",
-    description: "distilling fermented wheat",
+    name: "Rum distillation",
+    description: "distilling fermented sugarcane",
     interval: Step(1),
     workforce: 1,
     inputs: [
         (
             quantity: 3,
-            item: "items/wheat.item.ron",
+            item: "items/sugarcane.item.ron",
         ),
     ],
     outputs: [
         (
             quantity: 1,
-            item: "items/vodka.item.ron",
+            item: "items/rum.item.ron",
         ),
     ],
 )

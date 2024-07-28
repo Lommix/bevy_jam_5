@@ -43,8 +43,6 @@ impl ButtonWidget {
             .display(Display::Flex)
             .justify_content(JustifyContent::Center)
             .align_items(AlignItems::Center)
-            .background_color(COLOR_SECONDARY)
-            .border_color(COLOR_SECONDARY)
             .padding(UiRect::axes(Val::Px(15.), Val::Px(2.)))
             .border_radius(BorderRadius::all(Val::Px(5.)))
             .animated()
@@ -86,6 +84,10 @@ impl ButtonWidgetExt for UiBuilder<'_, Entity> {
         spawn_children: impl FnOnce(&mut UiBuilder<Entity>),
     ) -> UiBuilder<Entity> {
         self.container(ButtonWidget::frame(), |builder| {
+            builder
+                .style()
+                .background_color(COLOR_SECONDARY)
+                .border_color(COLOR_SECONDARY);
             spawn_children(builder);
         })
     }

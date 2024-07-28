@@ -37,6 +37,10 @@ fn update_options(
                 return;
             };
 
+            if cmd.get_entity(panel_ent).is_none() {
+                return;
+            };
+
             // can build? -> todo
             cmd.ui_builder(panel_ent)
                 .button(|button| {
@@ -80,19 +84,11 @@ impl Default for BuildPanel {
 }
 
 pub trait BuildPanelExt {
-    fn build_panel(
-        &mut self,
-        tile: Entity,
-        postion: Vec2,
-    ) -> UiBuilder<Entity>;
+    fn build_panel(&mut self, tile: Entity) -> UiBuilder<Entity>;
 }
 
 impl BuildPanelExt for UiBuilder<'_, Entity> {
-    fn build_panel(
-        &mut self,
-        tile: Entity,
-        position: Vec2,
-    ) -> UiBuilder<Entity> {
+    fn build_panel(&mut self, tile: Entity) -> UiBuilder<Entity> {
         let mut widget = BuildPanel::default();
         widget.tile = tile;
 
@@ -102,8 +98,6 @@ impl BuildPanelExt for UiBuilder<'_, Entity> {
                 panel
                     .style()
                     .flex_direction(FlexDirection::Column)
-                    .position_type(PositionType::Absolute)
-                    .absolute_position(position)
                     .row_gap(Val::Px(5.));
             },
         );
