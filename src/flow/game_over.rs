@@ -41,7 +41,7 @@ fn spawn_score(
                 .panel_bg(PanelConfig::title("Game Over"), |panel| {
                     panel.text(
                         format!(
-                            "You survived {} Years",
+                            "You did not met the expected production quota. The local Lord had you executed! {} Years survived",
                             context.current_year()
                         )
                         .as_str(),
@@ -52,13 +52,15 @@ fn spawn_score(
                             builder
                                 .text("Back to Menu", Size::Medium);
                         })
+                        .style()
+                        .margin(UiRect::top(Val::Px(50.)))
+                        .padding(UiRect::axes(Val::Px(15.), Val::Px(10.)))
                         .entity_commands()
                         .observe(back_to_menu);
                 })
                 .style()
                 .flex_direction(FlexDirection::Column)
-                .z_index(ZIndex::Global(10))
-                .background_color(Color::WHITE);
+                .z_index(ZIndex::Global(10));
         })
         .insert(StateScoped(ControlFlow::Score));
 }

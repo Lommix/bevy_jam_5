@@ -1,10 +1,8 @@
 (
-    item: (
-        name: "Beer",
-        description: "A fermented alcoholic beverage brewed with hops, barley, and water.",
-        icon: "beer",
-    ),
-    value: (20.49),
+    name: "Beer",
+    description: "A fermented alcoholic beverage brewed with hops, barley, and water.",
+    icon: "beer",
+    value: 20.49,
     rarity: Rare,
     tags: [Sellable],
 )

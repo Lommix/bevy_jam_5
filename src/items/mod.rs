@@ -14,62 +14,52 @@ mod inventory;
 pub mod prelude {
     pub use super::inventory::Inventory;
     pub use super::{
-        Eatable, GoldValue, Item, ItemAsset, ItemBundle, ItemPlugin,
-        Plantable, Quantity, SpawnItem, Tags,
+        Eatable, ItemAsset, ItemBundle, ItemPlugin, Plantable,
+        Quantity, Tags,
     };
 }
 
 pub struct ItemPlugin;
 impl Plugin for ItemPlugin {
     fn build(&self, app: &mut App) {
+        app.add_systems(Update, add_tags);
         app.add_plugins(inventory::InventoryPlugin);
         app.init_asset_loader::<ItemAssetLoader>();
         app.init_asset::<ItemAsset>();
-
-        app.register_type::<GoldValue>()
-            .register_type::<Rarity>()
-            .register_type::<Quantity>()
-            .register_type::<Item>();
     }
+}
+
+fn add_tags(
+    mut cmd: Commands,
+    items: Query<(Entity, &Handle<ItemAsset>), Added<Quantity>>,
+    assets: Res<Assets<ItemAsset>>,
+) {
+    items.iter().for_each(|(entity, handle)| {
+        let Some(item) = assets.get(handle) else {
+            return;
+        };
+
+        let mut cmd = cmd.entity(entity);
+        for tag in item.tags.iter() {
+            tag.add_comp(&mut cmd);
+        }
+    });
 }
 
 #[derive(Bundle)]
 pub struct ItemBundle {
-    pub item: Item,
-    pub value: GoldValue,
-    pub rarity: Rarity,
+    pub item: Handle<ItemAsset>,
     pub quantity: Quantity,
-    pub name: Name,
-}
-
-impl Default for ItemBundle {
-    fn default() -> Self {
-        Self {
-            item: Item::default(),
-            value: GoldValue::default(),
-            rarity: Rarity::default(),
-            quantity: Quantity::default(),
-            name: Name::new("item"),
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize, Asset, TypePath, Debug, Clone)]
 pub struct ItemAsset {
-    pub item: Item,
-    pub value: GoldValue,
-    pub rarity: Rarity,
-    pub tags: Vec<Tags>,
-}
-
-#[derive(
-    Component, Default, Reflect, Debug, Clone, Deserialize, Serialize,
-)]
-#[reflect]
-pub struct Item {
     pub name: String,
     pub description: String,
     pub icon: String,
+    pub value: f32,
+    pub rarity: Rarity,
+    pub tags: Vec<Tags>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -90,20 +80,6 @@ impl Tags {
 
 #[derive(
     Default,
-    Component,
-    Reflect,
-    Deref,
-    DerefMut,
-    Deserialize,
-    Serialize,
-    Debug,
-    Clone,
-)]
-#[reflect]
-pub struct GoldValue(pub f32);
-
-#[derive(
-    Default,
     Reflect,
     Component,
     Clone,
@@ -116,9 +92,7 @@ pub struct GoldValue(pub f32);
 #[reflect]
 pub struct Quantity(pub i32);
 
-#[derive(
-    Default, Reflect, Component, Deserialize, Serialize, Debug, Clone,
-)]
+#[derive(Default, Reflect, Deserialize, Serialize, Debug, Clone)]
 #[reflect]
 pub enum Rarity {
     #[default]
@@ -136,34 +110,6 @@ pub struct Plantable;
 
 #[derive(Component, Deserialize, Serialize)]
 pub struct Sellable;
-
-pub trait SpawnItem {
-    fn spawn_item(
-        &mut self,
-        asset: &ItemAsset,
-        quantity: i32,
-    ) -> EntityCommands;
-}
-impl SpawnItem for Commands<'_, '_> {
-    fn spawn_item(
-        &mut self,
-        asset: &ItemAsset,
-        quantity: i32,
-    ) -> EntityCommands {
-        let mut item = self.spawn((
-            asset.item.clone(),
-            asset.rarity.clone(),
-            asset.value.clone(),
-            Quantity(quantity),
-        ));
-
-        for tag in asset.tags.iter() {
-            tag.add_comp(&mut item);
-        }
-
-        item
-    }
-}
 
 #[derive(Default)]
 pub struct ItemAssetLoader;

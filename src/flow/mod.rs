@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 mod autoplay;
+mod debt;
 mod game_over;
 mod new_game;
 mod news;
@@ -52,6 +53,7 @@ impl Plugin for GameFlowPlugin {
             news::NewsPlugin,
             seasons::SeasonPlugin,
             game_over::GameOverPlugin,
+            debt::DebtPlugin,
         ));
 
         app.configure_sets(

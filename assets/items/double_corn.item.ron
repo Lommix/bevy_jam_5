@@ -1,10 +1,8 @@
 (
-    item: (
-        name: "Double Corn",
-        description: "A very strong alcoholic drink.",
-        icon: "keg",
-    ),
-    value: (2.49),
+    name: "Double Corn",
+    description: "A very strong alcoholic drink.",
+    icon: "keg",
+    value: 2.49,
     rarity: Rare,
     tags: [Sellable],
 )

@@ -103,20 +103,19 @@ fn load_valid_actions(
                     .map(|h| h.id() == handle.id())
                     .unwrap_or_default()
                 {
-                    info!("--------------------------- active!!!!!");
                     button.style().background_color(COLOR_ACTIVE);
-                } else {
-                    button
-                        .insert((
-                            ActionTarget {
-                                target: building_ent,
-                                widget: entity,
-                            },
-                            TileAction::SetOrder(handle.clone()),
-                        ))
-                        .entity_commands()
-                        .observe(on_action_pressed);
                 }
+
+                button
+                    .insert((
+                        ActionTarget {
+                            target: building_ent,
+                            widget: entity,
+                        },
+                        TileAction::SetOrder(handle.clone()),
+                    ))
+                    .entity_commands()
+                    .observe(on_action_pressed);
             });
         });
 

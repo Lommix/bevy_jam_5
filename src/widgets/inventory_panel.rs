@@ -19,8 +19,9 @@ fn render_inventory(
     >,
     inventories: Query<&Inventory>,
     children: Query<&Children>,
-    items: Query<(&Item, &Quantity)>,
-    assets: Res<SpriteAssets>,
+    items: Query<(&Handle<ItemAsset>, &Quantity)>,
+    item_assets: Res<Assets<ItemAsset>>,
+    sprites: Res<SpriteAssets>,
 ) {
     for (widget_ent, widget) in widgets.iter() {
         let Ok(inventory) = inventories.get(widget.inventory) else {
@@ -32,7 +33,12 @@ fn render_inventory(
         };
 
         for item_ent in content.iter() {
-            let Ok((item, quant)) = items.get(*item_ent) else {
+            let Ok((item_handle, quant)) = items.get(*item_ent)
+            else {
+                continue;
+            };
+
+            let Some(item) = item_assets.get(item_handle) else {
                 continue;
             };
 
@@ -47,7 +53,7 @@ fn render_inventory(
 
                     div.text(&format!("{}x", **quant), Size::Small);
                     div.ase_image(
-                        assets.icons.clone(),
+                        sprites.icons.clone(),
                         &item.icon,
                         |_| {},
                     )

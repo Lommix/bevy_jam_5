@@ -1,10 +1,8 @@
 (
-    item: (
-        name: "Grapes",
-        description: "A bunch of juicy fruits commonly used to make wine.",
-        icon: "grapes",
-    ),
-    value: (2.5),
+	name: "Grapes",
+	description: "A bunch of juicy fruits commonly used to make wine.",
+	icon: "grapes",
+	value: 2.5,
     rarity: Common,
     tags: [Eatable, Sellable, Plantable],
 )

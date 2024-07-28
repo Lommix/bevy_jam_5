@@ -173,13 +173,12 @@ fn finish_workorder(
     for input in order.inputs.iter() {}
 
     for output in order.outputs.iter() {
-        let Some(item) = items.get(&output.item_handle) else {
-            warn!("crafting - missing item");
-            return;
-        };
-
-        let item_id =
-            cmd.spawn_item(item, output.quantity as i32).id();
+        let item_id = cmd
+            .spawn(ItemBundle {
+                item: output.item_handle.clone(),
+                quantity: Quantity(output.quantity as i32),
+            })
+            .id();
         cmd.entity(inventory.queue).add_child(item_id);
     }
 }
@@ -236,7 +235,7 @@ fn on_produce_particles(
     cmd.spawn((
         AsepriteSliceBundle {
             transform: Transform::from_translation(postion),
-            slice: output.item.icon.as_str().into(),
+            slice: output.icon.as_str().into(),
             aseprite: sprites.icons.clone(),
             ..default()
         },

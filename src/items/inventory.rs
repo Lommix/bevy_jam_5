@@ -41,7 +41,7 @@ fn on_added(
 
 fn work_queue(
     mut cmd: Commands,
-    mut items: Query<(&mut Quantity, &Item)>,
+    mut items: Query<(&mut Quantity, &Handle<ItemAsset>)>,
     inventories: Query<&Inventory>,
     children: Query<&Children>,
 ) {
@@ -68,7 +68,7 @@ fn work_queue(
                     continue;
                 };
 
-                if item.name == in_item.name {
+                if item.id() == in_item.id() {
                     **quant = **quant + *in_quant;
                     merged = true;
                 }

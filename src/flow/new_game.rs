@@ -7,18 +7,17 @@ pub fn new_game(
     mut flow: ResMut<NextState<ControlFlow>>,
     sprites: Res<SpriteAssets>,
     items: Res<ItemAssets>,
-    item_assets: Res<Assets<ItemAsset>>,
 ) {
     let Ok(center_ui) = center.get_single() else {
         return;
     };
 
-    let Some(carrot) = item_assets.get(&items.carrot) else {
-        error!("Items not loaded");
-        return;
-    };
-
-    let starting_food = cmd.spawn_item(carrot, 40).id();
+    let starting_food = cmd
+        .spawn(ItemBundle {
+            item: items.carrot.clone(),
+            quantity: Quantity(40),
+        })
+        .id();
 
     let bag = cmd
         .spawn(Name::new("Player Inventory"))

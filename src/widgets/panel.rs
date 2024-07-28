@@ -119,11 +119,11 @@ impl PanelExt for UiBuilder<'_, Entity> {
                 if config.close_button {
                     panel_div.div(|div| {
                         div.style()
-                            .bottom(Val::Px(-15.))
+                            .top(Val::Px(-16.))
                             .position_type(PositionType::Absolute)
                             .width(Val::Percent(100.))
-                            .justify_content(JustifyContent::Center)
-                            .left(Val::Px(0.));
+                            .padding(UiRect::horizontal(Val::Px(20.)))
+                            .justify_content(JustifyContent::End);
 
                         panel.close = div
                             .container(
