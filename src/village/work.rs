@@ -21,11 +21,15 @@ impl Plugin for WorkOrderPlugin {
             .add_event::<WorkOrderFinished>()
             .add_systems(
                 OnEnter(ControlFlow::Autoplay),
-                progress_workorder,
+                (progress_workorder, on_missing_spawn_float),
             )
             .observe(finish_workorder)
+            .observe(sub_item_cost)
             .observe(on_produce_particles)
-            .add_systems(Update, update_workforce);
+            .add_systems(
+                Update,
+                (update_workforce, update_has_items),
+            );
     }
 }
 
@@ -104,7 +108,10 @@ pub struct WorkOrderBundle {
 
 pub(crate) fn progress_workorder(
     mut cmd: Commands,
-    mut query: Query<(Entity, &mut Working, &Handle<WorkOrder>)>,
+    mut query: Query<
+        (Entity, &mut Working, &Handle<WorkOrder>),
+        With<HasItemsToCraft>,
+    >,
     season: Res<State<Season>>,
     work: Res<Assets<WorkOrder>>,
     repeat: Query<&LoopOrder>,
@@ -140,15 +147,66 @@ pub(crate) fn progress_workorder(
     });
 }
 
-fn finish_workorder(
-    trigger: Trigger<WorkOrderFinished>,
+#[derive(Component)]
+pub struct HasItemsToCraft;
+
+fn update_has_items(
     mut cmd: Commands,
-    orders: Query<(&Handle<WorkOrder>, &TargetInventory)>,
-    work: Res<Assets<WorkOrder>>,
-    items: Res<Assets<ItemAsset>>,
+    query: Query<(Entity, &Handle<WorkOrder>, &TargetInventory)>,
     inventories: Query<&Inventory>,
     children: Query<&Children>,
-    item_entities: Query<(&Quantity, &Handle<ItemAsset>)>,
+    items: Query<(&Handle<ItemAsset>, &Quantity)>,
+    orders: Res<Assets<WorkOrder>>,
+) {
+    query.iter().for_each(|(entity, handle, target)| {
+        let Some(order) = orders.get(handle) else {
+            return;
+        };
+
+        let Ok(inventory) = inventories.get(**target) else {
+            return;
+        };
+
+        let Some(owned_items) =
+            children.get(inventory.bag).ok().map(|children| {
+                children
+                    .iter()
+                    .flat_map(|child| items.get(*child))
+                    .collect::<Vec<_>>()
+            })
+        else {
+            return;
+        };
+
+        let has_items = order.inputs.iter().all(|slot| {
+            for (handle, quant) in owned_items.iter() {
+                if slot.item_handle.id() != handle.id() {
+                    continue;
+                }
+
+                if ***quant >= slot.quantity as i32 {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        if has_items {
+            cmd.entity(entity).insert(HasItemsToCraft);
+        } else {
+            cmd.entity(entity).remove::<HasItemsToCraft>();
+        }
+    })
+}
+
+fn sub_item_cost(
+    trigger: Trigger<WorkOrderFinished>,
+    inventories: Query<&Inventory>,
+    children: Query<&Children>,
+    orders: Query<(&Handle<WorkOrder>, &TargetInventory)>,
+    work: Res<Assets<WorkOrder>>,
+    mut item_entities: Query<(&mut Quantity, &Handle<ItemAsset>)>,
 ) {
     let Ok((order_handle, target)) = orders.get(trigger.entity())
     else {
@@ -164,13 +222,55 @@ fn finish_workorder(
         return;
     };
 
-    let Ok(item_iter) =
-        children.get(inventory.bag).map(|children| children.iter())
+    let Some(owned_items_entities) = children
+        .get(inventory.bag)
+        .ok()
+        .map(|children| children.iter().collect::<Vec<_>>())
     else {
         return;
     };
 
-    for input in order.inputs.iter() {}
+    for slot in order.inputs.iter() {
+        for ent in owned_items_entities.iter() {
+            let Ok((mut quant, handle)) =
+                item_entities.get_mut(**ent)
+            else {
+                continue;
+            };
+
+            if slot.item_handle.id() != handle.id() {
+                continue;
+            }
+
+            info!(
+                "reduced items ({:?}) by {}",
+                handle, slot.quantity
+            );
+            **quant -= slot.quantity as i32;
+        }
+    }
+}
+
+fn finish_workorder(
+    trigger: Trigger<WorkOrderFinished>,
+    mut cmd: Commands,
+    orders: Query<(&Handle<WorkOrder>, &TargetInventory)>,
+    work: Res<Assets<WorkOrder>>,
+    inventories: Query<&Inventory>,
+) {
+    let Ok((order_handle, target)) = orders.get(trigger.entity())
+    else {
+        return;
+    };
+
+    let Some(order) = work.get(order_handle) else {
+        return;
+    };
+
+    let Ok(inventory) = inventories.get(**target) else {
+        warn!("target does no longer exists");
+        return;
+    };
 
     for output in order.outputs.iter() {
         let item_id = cmd
@@ -183,8 +283,44 @@ fn finish_workorder(
     }
 }
 
-#[derive(Component)]
-pub struct FloatItem;
+fn on_missing_spawn_float(
+    query: Query<
+        &Parent,
+        (Without<HasItemsToCraft>, With<Handle<WorkOrder>>),
+    >,
+    fonts: Res<FontAssets>,
+    mut cmd: Commands,
+) {
+    query.iter().for_each(|parent| {
+        let tween = Tween::new(
+            EaseFunction::QuadraticInOut,
+            Duration::from_secs_f32(0.5),
+            TransformPositionLens {
+                start: Vec3::Z * 20.,
+                end: Vec3::Z * 20. + Vec3::new(0., 30., 0.),
+            },
+        );
+        let text = cmd
+            .spawn((
+                Animator::new(tween),
+                Lifetime::seconds(0.5),
+                Text2dBundle {
+                    text: Text::from_section(
+                        "No Items",
+                        TextStyle {
+                            font: fonts.font.clone(),
+                            font_size: 14.,
+                            ..default()
+                        },
+                    ),
+                    ..default()
+                },
+            ))
+            .id();
+
+        cmd.entity(parent.get()).add_child(text);
+    })
+}
 
 fn on_produce_particles(
     trigger: Trigger<WorkOrderFinished>,
