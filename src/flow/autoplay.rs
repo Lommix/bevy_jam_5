@@ -5,19 +5,12 @@ pub struct AutplayPlugin;
 impl Plugin for AutplayPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            OnEnter(ControlFlow::Autoplay),
-            spawn_progress_bar,
-        );
-        app.add_systems(
             Update,
             progress_autoplay.run_if(in_state(ControlFlow::Autoplay)),
         );
     }
 }
 
-pub(crate) fn spawn_progress_bar() {
-    info!("starting autoplay!");
-}
 
 pub(crate) fn progress_autoplay(
     mut counter: Local<f32>,

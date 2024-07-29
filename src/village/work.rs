@@ -8,8 +8,8 @@ use lens::{TransformPositionLens, TransformScaleLens};
 
 pub mod prelude {
     pub use super::{
-        LoopOrder, TargetInventory, WorkOrder, WorkOrderBundle,
-        WorkOrderFinished, Working,
+        ItemSlot, LoopOrder, TargetInventory, WorkOrder,
+        WorkOrderBundle, WorkOrderFinished, Working,
     };
 }
 
@@ -20,8 +20,9 @@ impl Plugin for WorkOrderPlugin {
             .add_plugins(WorkOrderAssetPlugin)
             .add_event::<WorkOrderFinished>()
             .add_systems(
-                OnEnter(ControlFlow::Autoplay),
-                (progress_workorder, on_missing_spawn_float),
+                Update,
+                (progress_workorder, on_missing_spawn_float)
+                    .run_if(on_event::<SeasonShiftEvent>()),
             )
             .observe(finish_workorder)
             .observe(sub_item_cost)
@@ -85,18 +86,18 @@ pub struct TargetInventory(pub Entity);
 
 pub(crate) fn update_workforce(
     mut village: Query<&mut Village, With<Player>>,
-    orders: Query<&Handle<WorkOrder>>,
-    work: Res<Assets<WorkOrder>>,
+    handles: Query<&Handle<BuildingAsset>, With<GlobalTransform>>,
+    buildings: Res<Assets<BuildingAsset>>,
 ) {
     let Ok(mut village) = village.get_single_mut() else {
         return;
     };
 
-    village.villager_busy = orders
+    village.villager_busy = handles
         .iter()
-        .flat_map(|handle| work.get(handle))
-        .map(|order| order.workforce)
-        .sum::<u32>() as i32;
+        .flat_map(|handle| buildings.get(handle))
+        .map(|building| building.workforce)
+        .sum::<i32>();
 }
 
 #[derive(Bundle)]
@@ -133,7 +134,6 @@ pub(crate) fn progress_workorder(
         };
 
         if finished {
-            info!("finished work order");
             cmd.trigger_targets(WorkOrderFinished, entity);
             match repeat.get(entity) {
                 Ok(_) => {
@@ -242,10 +242,6 @@ fn sub_item_cost(
                 continue;
             }
 
-            info!(
-                "reduced items ({:?}) by {}",
-                handle, slot.quantity
-            );
             **quant -= slot.quantity as i32;
         }
     }

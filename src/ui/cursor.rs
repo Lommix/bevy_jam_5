@@ -9,7 +9,7 @@ pub mod prelude {
 pub struct CursorPlugin;
 impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::Menu), spawn_cursor)
+        app.add_systems(Startup, spawn_cursor)
             .init_state::<CursorState>()
             .add_systems(
                 First,
@@ -78,14 +78,10 @@ fn update_cursor(
     };
 }
 
-fn spawn_cursor(mut cmd: Commands, sprites: Res<SpriteAssets>) {
+fn spawn_cursor(mut cmd: Commands) {
     cmd.spawn((
         Name::new("Cursor"),
-        AsepriteSliceBundle {
-            slice: "vodka".into(),
-            aseprite: sprites.icons.clone(),
-            ..default()
-        },
+        SpatialBundle::default(),
         Cursor,
     ));
 }

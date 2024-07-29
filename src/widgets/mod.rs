@@ -9,6 +9,7 @@ mod dialog;
 mod div;
 mod inventory_panel;
 mod panel;
+mod sell_panel;
 mod text;
 mod tile_info;
 mod village_hud;
@@ -30,6 +31,7 @@ pub mod prelude {
     pub use super::panel::{
         Panel, PanelClosed, PanelConfig, PanelExt,
     };
+    pub use super::sell_panel::prelude::*;
     pub use super::text::TextExt;
     pub use super::tile_info::{TileInfoExt, TileInfoWidget};
     pub use super::village_hud::{VillageHudExt, VillageHudWidget};
@@ -49,6 +51,7 @@ impl Plugin for UiPlugin {
             tile_info::TileInfoPanelPlugin,
             text::TextPlugin,
             action_panel::ActionPanelPlugin,
+            sell_panel::SellPanelPlugin,
         ));
     }
 }

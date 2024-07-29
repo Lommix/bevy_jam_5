@@ -18,8 +18,8 @@ impl Plugin for BuildPlugin {
         );
 
         app.add_systems(
-            OnExit(ControlFlow::Autoplay),
-            progress_buildings,
+            Update,
+            progress_buildings.run_if(on_event::<SeasonShiftEvent>()),
         );
     }
 }
@@ -30,6 +30,7 @@ ron_asset_loader!(
     BuildingAsset,
     &["build.ron"],
     sprite -> sprite_handle
+    ;item_cost -> (item -> item_handle)
     =produces -> produce_handles
 );
 
@@ -52,8 +53,9 @@ pub struct BuildingAsset {
     pub description: String,
     pub sprite: String,
     pub produces: Vec<String>,
-
+    pub workforce: i32,
     pub build_cost: Option<f32>,
+    pub item_cost: Vec<ItemSlot>,
     pub build_time: u32,
 
     #[serde(skip)]

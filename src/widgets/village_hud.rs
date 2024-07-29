@@ -15,9 +15,12 @@ fn update_hud(
     villages: Query<(&Village, &Inventory)>,
     bag: Query<&Children>,
     huds: Query<&VillageHudWidget>,
-    food: Query<&Quantity, With<Eatable>>,
+    items: Query<(&Quantity, &Handle<ItemAsset>)>,
+    eatable: Query<(), With<Eatable>>,
     seasons: Res<State<Season>>,
     mut texts: Query<&mut Text>,
+    font: Res<FontAssets>,
+    item_assets: Res<ItemAssets>,
 ) {
     huds.iter().for_each(|hud| {
         let Ok((village, inventory)) = villages.get(hud.village)
@@ -25,14 +28,29 @@ fn update_hud(
             return;
         };
 
-        let Ok(items) = bag.get(inventory.bag) else {
+        let Ok(item_enteties) = bag.get(inventory.bag) else {
             return;
         };
 
-        let food_count = items
+        let food_count = item_enteties
             .iter()
-            .flat_map(|ent| food.get(*ent).ok())
-            .map(|quant| **quant)
+            .flat_map(|ent| {
+                if eatable.get(*ent).is_err() {
+                    return None;
+                }
+
+                items.get(*ent).ok()
+            })
+            .map(|(quant, _)| **quant)
+            .sum::<i32>();
+
+        let wood_count = item_enteties
+            .iter()
+            .flat_map(|ent| items.get(*ent).ok())
+            .filter(|(_, handle)| {
+                handle.id() == item_assets.wood.id()
+            })
+            .map(|(quant, _)| **quant)
             .sum::<i32>();
 
         _ = texts.get_mut(hud.season_txt).map(|mut txt| {
@@ -40,21 +58,47 @@ fn update_hud(
             txt.sections = vec![s.into()];
         });
 
+        _ = texts.get_mut(hud.wood_txt).map(|mut txt| {
+            txt.sections = vec![TextSection::new(
+                format!("{}", wood_count),
+                TextStyle {
+                    font: font.font.clone(),
+                    ..default()
+                },
+            )];
+        });
         _ = texts.get_mut(hud.food_txt).map(|mut txt| {
-            txt.sections =
-                vec![format!("{} Food", food_count).into()];
+            txt.sections = vec![TextSection::new(
+                format!("{}", food_count),
+                TextStyle {
+                    font: font.font.clone(),
+                    ..default()
+                },
+            )];
         });
         _ = texts.get_mut(hud.gold_txt).map(|mut txt| {
-            txt.sections =
-                vec![format!("{} Gold", inventory.gold).into()];
+            txt.sections = vec![TextSection::new(
+                format!("{:.1}", inventory.gold),
+                TextStyle {
+                    font: font.font.clone(),
+                    ..default()
+                },
+            )];
         });
         _ = texts.get_mut(hud.villager_count_txt).map(|mut txt| {
-            txt.sections = vec![format!(
-                "{}/{} Villager",
+            let s = format!(
+                "{}/{}",
                 village.villager_count - village.villager_busy,
                 village.villager_count
-            )
-            .into()];
+            );
+
+            txt.sections = vec![TextSection::new(
+                s,
+                TextStyle {
+                    font: font.font.clone(),
+                    ..default()
+                },
+            )];
         });
     });
 }
@@ -63,6 +107,7 @@ fn update_hud(
 pub struct VillageHudWidget {
     village: Entity,
     food_txt: Entity,
+    wood_txt: Entity,
     gold_txt: Entity,
     villager_count_txt: Entity,
     season_txt: Entity,
@@ -74,6 +119,7 @@ impl Default for VillageHudWidget {
             village: Entity::PLACEHOLDER,
             food_txt: Entity::PLACEHOLDER,
             gold_txt: Entity::PLACEHOLDER,
+            wood_txt: Entity::PLACEHOLDER,
             villager_count_txt: Entity::PLACEHOLDER,
             season_txt: Entity::PLACEHOLDER,
         }
@@ -121,6 +167,23 @@ impl VillageHudExt for UiBuilder<'_, Entity> {
                             .height(Val::Px(32.));
                         widget.food_txt =
                             builder.text("food", Size::Medium).id();
+                    })
+                    .style()
+                    .width(Val::Percent(100.));
+
+                builder
+                    .button(|builder| {
+                        builder
+                            .ase_image(
+                                sprites.icons.clone(),
+                                "wood",
+                                |_| {},
+                            )
+                            .style()
+                            .width(Val::Px(32.))
+                            .height(Val::Px(32.));
+                        widget.wood_txt =
+                            builder.text("wood", Size::Medium).id();
                     })
                     .style()
                     .width(Val::Percent(100.));

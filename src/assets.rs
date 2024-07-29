@@ -28,6 +28,8 @@ pub struct SpriteAssets {
     pub workshop: Handle<Aseprite>,
     #[asset(path = "raw/construct.aseprite")]
     pub construct: Handle<Aseprite>,
+    #[asset(path = "raw/market.aseprite")]
+    pub market: Handle<Aseprite>,
 }
 
 #[derive(AssetCollection, Resource)]
@@ -39,6 +41,8 @@ pub struct ItemAssets {
     #[asset(path = "items/rum.item.ron")]
     pub rum: Handle<ItemAsset>,
 
+    #[asset(path = "items/wood.item.ron")]
+    pub wood: Handle<ItemAsset>,
     #[asset(path = "items/corn.item.ron")]
     pub corn: Handle<ItemAsset>,
     #[asset(path = "items/carrot.item.ron")]
@@ -61,6 +65,8 @@ pub struct WorkOrderAssets {
     pub grow_potatos: Handle<WorkOrder>,
     #[asset(path = "orders/carrots.work.ron")]
     pub grow_carrots: Handle<WorkOrder>,
+    #[asset(path = "orders/wood.work.ron")]
+    pub wood: Handle<WorkOrder>,
 }
 
 #[derive(AssetCollection, Resource)]
@@ -71,6 +77,12 @@ pub struct BuildingAssets {
     pub field: Handle<BuildingAsset>,
     #[asset(path = "buildings/workshop.build.ron")]
     pub workshop: Handle<BuildingAsset>,
+    #[asset(path = "buildings/market.build.ron")]
+    pub market: Handle<BuildingAsset>,
+    #[asset(path = "buildings/lumbermill.build.ron")]
+    pub lumbermill: Handle<BuildingAsset>,
+    #[asset(path = "buildings/statue.build.ron")]
+    pub statue: Handle<BuildingAsset>,
 }
 
 impl BuildingAssets {
@@ -81,6 +93,9 @@ impl BuildingAssets {
             self.house.clone(),
             self.field.clone(),
             self.workshop.clone(),
+            self.market.clone(),
+            self.lumbermill.clone(),
+            self.statue.clone(),
         ]
         .into_iter()
     }

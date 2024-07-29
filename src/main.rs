@@ -3,7 +3,7 @@
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy::render::texture::ImageSamplerDescriptor;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_embedded_assets::EmbeddedAssetPlugin;
 
 mod app_state;
 mod assets;
@@ -36,7 +36,10 @@ pub mod prelude {
 #[rustfmt::skip]
 fn main() {
     App::new()
-        .add_plugins(
+        .add_plugins((
+            EmbeddedAssetPlugin {
+                mode: bevy_embedded_assets::PluginMode::ReplaceDefault,
+            },
             DefaultPlugins.set(AssetPlugin {
                 meta_check: AssetMetaCheck::Never,
             ..default()
@@ -44,11 +47,9 @@ fn main() {
             .set(ImagePlugin{
                     default_sampler: ImageSamplerDescriptor::nearest()
             })
-        )
+        ))
         .add_plugins((
             sickle_ui::SickleUiPlugin,
-            avian2d::PhysicsPlugins::default(),
-            WorldInspectorPlugin::default(),
             bevy_aseprite_ultra::BevySprityPlugin,
             bevy_tweening::TweeningPlugin,
         ))

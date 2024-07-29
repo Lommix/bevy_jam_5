@@ -23,6 +23,12 @@ pub const COLOR_ACCENT: Color = Color::LinearRgba(LinearRgba {
     alpha: 1.,
 });
 
+pub const COLOR_INACTIVE: Color = Color::LinearRgba(LinearRgba {
+    red: 43. / 255.,
+    green: 43. / 255.,
+    blue: 43. / 255.,
+    alpha: 1.,
+});
 
 pub const COLOR_ACTIVE: Color = Color::LinearRgba(LinearRgba {
     red: 6. / 255.,
@@ -30,7 +36,6 @@ pub const COLOR_ACTIVE: Color = Color::LinearRgba(LinearRgba {
     blue: 28. / 255.,
     alpha: 1.,
 });
-
 
 pub const COLOR_ERROR: Color = Color::LinearRgba(LinearRgba {
     red: 156. / 255.,

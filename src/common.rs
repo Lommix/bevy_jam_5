@@ -8,7 +8,7 @@ pub mod prelude {
 pub struct CommonPlugin;
 impl Plugin for CommonPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(First, (free, tick_cooldown, tick_lifetime));
+        app.add_systems(Last, (free, tick_cooldown, tick_lifetime));
     }
 }
 
@@ -41,7 +41,9 @@ fn tick_lifetime(
     lifetimes.iter_mut().for_each(|(entity, mut life)| {
         **life -= time.delta_seconds();
         if **life <= 0. {
-            cmd.entity(entity).despawn_recursive();
+            if let Some(cmd) = cmd.get_entity(entity) {
+                cmd.despawn_recursive();
+            }
         }
     });
 }
@@ -61,7 +63,9 @@ fn tick_cooldown(
     cooldowns.iter_mut().for_each(|(entity, mut cd)| {
         **cd -= time.delta_seconds();
         if **cd <= 0. {
-            cmd.entity(entity).remove::<Cooldown>();
+            if let Some(mut cmd) = cmd.get_entity(entity) {
+                cmd.remove::<Cooldown>();
+            }
         }
     });
 }

@@ -22,7 +22,7 @@ impl Plugin for VillageTileamap {
         app.observe(highlight_tile);
         app.add_systems(
             Update,
-            check_clicked.run_if(in_state(ControlFlow::PlayerTurn)),
+            check_clicked.run_if(in_state(ControlFlow::Playing)),
         );
     }
 }
@@ -104,6 +104,7 @@ fn check_clicked(
         .iter()
         .map(|(ent, global)| (ent, global.translation().truncate()))
         .filter(|(_, pos)| {
+
             collide_aabb(
                 *pos,
                 tile_map.tile_size / 2.,
@@ -170,7 +171,7 @@ fn spawn_map(
 
     let entities = tiles.iter().map(|(_, v)| *v).collect::<Vec<_>>();
     cmd.spawn((
-        Name::new(""),
+        Name::new("map"),
         SpatialBundle::default(),
         TileMap {
             map_size: IVec2::new(5, 5),
@@ -178,8 +179,6 @@ fn spawn_map(
             tiles,
         },
         StateScoped(AppState::Playing),
-        Button,
-        Interaction::None,
     ))
     .push_children(entities.as_slice());
 }

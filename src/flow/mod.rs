@@ -1,6 +1,5 @@
 use crate::prelude::*;
 
-mod autoplay;
 mod debt;
 mod game_over;
 mod new_game;
@@ -11,6 +10,7 @@ mod session;
 
 #[allow(unused)]
 pub mod prelude {
+    pub use super::game_over::GameOverEvent;
     pub use super::news::prelude::*;
     pub use super::seasons::{
         Season, SeasonPlugin, SeasonShiftEvent,
@@ -26,9 +26,7 @@ pub mod prelude {
 pub enum ControlFlow {
     #[default]
     Intro,
-    News,
-    PlayerTurn,
-    Autoplay,
+    Playing,
     Score,
 }
 
@@ -48,7 +46,6 @@ pub struct GameFlowPlugin;
 impl Plugin for GameFlowPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
-            autoplay::AutplayPlugin,
             player_turn::PlayerTurnPlugin,
             news::NewsPlugin,
             seasons::SeasonPlugin,

@@ -10,7 +10,7 @@ impl Plugin for DialogWidgetPlugin {
 
 #[derive(Component)]
 pub struct DialogWidget {
-    text: Entity,
+    pub text: Entity,
 }
 
 impl Default for DialogWidget {
@@ -32,7 +32,7 @@ impl DialogExt for UiBuilder<'_, Entity> {
     fn dialog(&mut self, text: &str) -> UiBuilder<Entity> {
         let mut widget = DialogWidget::default();
         let mut out = self.panel_bg(
-            PanelConfig::default().with_close(),
+            PanelConfig::default(),
             |panel| {
                 panel
                     .style()

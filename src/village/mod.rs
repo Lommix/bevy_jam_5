@@ -23,7 +23,28 @@ impl Plugin for VillagePlugin {
             build::BuildPlugin,
             work::WorkOrderPlugin,
         ));
+        app.add_systems(
+            Update,
+            update_village_count.in_set(GameSysSets::InGame),
+        );
     }
+}
+
+fn update_village_count(
+    houses: Query<&Handle<BuildingAsset>>,
+    mut village: Query<&mut Village>,
+    buildings: Res<BuildingAssets>,
+) {
+    let house_count = houses
+        .iter()
+        .filter(|h| h.id() == buildings.house.id())
+        .count();
+
+    let Ok(mut village) = village.get_single_mut() else {
+        return;
+    };
+
+    village.villager_count = house_count as i32 * 4;
 }
 
 #[derive(Bundle)]

@@ -1,6 +1,8 @@
 use crate::prelude::*;
 use sickle_ui::prelude::*;
 
+use super::sell_panel::SellPanelExt;
+
 pub mod prelude {
     pub use super::{ActionPanelExt, ActionPanelWidget};
 }
@@ -44,9 +46,12 @@ fn load_actions(
 
         match maybe_building {
             Some(building) => {
+                // hey sometimes, time just runs out
                 if building.name == "House" {
                     cmd.ui_builder(widget_entity)
                         .inventory_panel(player);
+                } else if building.name == "Market" {
+                    cmd.ui_builder(widget_entity).sell_panel();
                 } else {
                     cmd.ui_builder(widget_entity)
                         .tile_info(widget.tile);

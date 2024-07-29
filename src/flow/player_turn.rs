@@ -4,46 +4,8 @@ use sickle_ui::prelude::*;
 pub struct PlayerTurnPlugin;
 impl Plugin for PlayerTurnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(ControlFlow::PlayerTurn), start_turn);
         app.observe(on_tile_clicked);
     }
-}
-
-// enable clicking
-// make descision
-// end turn
-fn start_turn(
-    mut cmd: Commands,
-    query: Query<Entity, With<BottomUi>>,
-) {
-    let Ok(bottom_ui) = query.get_single() else {
-        return;
-    };
-
-    cmd.ui_builder(bottom_ui)
-        .div_centered(|builder| {
-            builder
-                .button(|button| {
-                    button.style().padding(UiRect::axes(
-                        Val::Px(20.),
-                        Val::Px(10.),
-                    ));
-
-                    button.text("End this turn", Size::Large);
-                })
-                .entity_commands()
-                .observe(end_turn);
-        })
-        .insert(StateScoped(ControlFlow::PlayerTurn));
-}
-
-fn end_turn(
-    _trigger: Trigger<ButtonClicked>,
-    mut flow: ResMut<NextState<ControlFlow>>,
-    mut cmd: Commands,
-) {
-    cmd.trigger(ClearHighlights);
-    flow.set(ControlFlow::Autoplay);
 }
 
 #[derive(Component)]
@@ -80,6 +42,6 @@ fn on_tile_clicked(
                 panel_anchor_position,
             );
         })
-        .insert(ActionCard)
-        .insert(StateScoped(ControlFlow::PlayerTurn));
+        .insert(StateScoped(ControlFlow::Playing))
+        .insert(ActionCard);
 }

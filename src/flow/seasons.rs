@@ -1,3 +1,7 @@
+use std::time::Duration;
+
+use bevy::time::common_conditions::on_timer;
+
 use crate::prelude::*;
 
 pub struct SeasonPlugin;
@@ -6,7 +10,12 @@ impl Plugin for SeasonPlugin {
         app.add_event::<SeasonShiftEvent>()
             .init_state::<Season>()
             .enable_state_scoped_entities::<Season>()
-            .add_systems(OnExit(ControlFlow::Autoplay), next_season);
+            .add_systems(
+                Update,
+                next_season
+                    .run_if(in_state(ControlFlow::Playing))
+                    .run_if(on_timer(Duration::from_secs(4))),
+            );
     }
 }
 

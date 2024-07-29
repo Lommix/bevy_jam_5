@@ -48,6 +48,10 @@ fn drain_food(
         if to_feed > 0 {
             village.villager_count -= to_feed;
             village.villager_count = village.villager_count.max(0);
+
+            if village.villager_count <= 0 {
+                cmd.trigger(GameOverEvent::Hunger);
+            }
         }
     });
 }

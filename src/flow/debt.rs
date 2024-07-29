@@ -8,12 +8,12 @@ impl Plugin for DebtPlugin {
 }
 
 fn on_new_year(
+    mut cmd: Commands,
     mut events: EventWriter<NewsEvent>,
     mut inventory: Query<
         (&mut Inventory, &GameContext),
         With<Player>,
     >,
-    mut next_state: ResMut<NextState<ControlFlow>>,
 ) {
     let Ok((mut inventory, context)) = inventory.get_single_mut()
     else {
@@ -21,13 +21,17 @@ fn on_new_year(
     };
 
     inventory.gold -=
-        100. * (1. + context.current_year() as f32 * 0.1);
+        20. * (1. + context.current_year() as f32 * 0.1);
 
-    if inventory.gold < 0. {
-        events.send(NewsEvent { message: format!("Oh no! You messed up! You went in depbt to pay taxes.") });
+    if inventory.gold < 0. && inventory.gold > -300. {
+        events.send(NewsEvent { message: format!("Oh no! You messed up! You went in dept to pay taxes. Better don't let it get to high!") });
     }
 
-    if inventory.gold < -1000. {
-        next_state.set(ControlFlow::Score);
+    if inventory.gold < -300. {
+        events.send(NewsEvent { message: format!("The local lord is very disappointed, make money fast or loose your head!") });
+    }
+
+    if inventory.gold < -400. {
+        cmd.trigger(GameOverEvent::Debt);
     }
 }

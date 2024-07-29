@@ -50,5 +50,5 @@ pub fn new_game(
         })
         .insert(StateScoped(AppState::Playing));
 
-    flow.set(ControlFlow::News);
+    flow.set(ControlFlow::Playing);
 }

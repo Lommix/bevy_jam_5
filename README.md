@@ -1,8 +1,6 @@
-# Beveragy Tycoon mini
+# Brew Tycoon
 
-### Bevy Game Jam 5
-
-[WIP]
+bevy game jam 5 entry. Checking out sickle ui.
 
 ## Sprites
 
@@ -10,4 +8,4 @@
 
 ## Used Assets
 
--   [https://opengameart.org/content/rise-of-spirit](rise of spirit)
+-   Background music: [rise of the spirit](https://opengameart.org/content/rise-of-spirit)

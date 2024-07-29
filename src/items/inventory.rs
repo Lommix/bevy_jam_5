@@ -1,5 +1,6 @@
-pub use crate::prelude::*;
+use bevy::utils::HashMap;
 
+pub use crate::prelude::*;
 pub struct InventoryPlugin;
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
@@ -54,12 +55,28 @@ fn work_queue(
             continue;
         };
 
+        let mut queue_sorted: HashMap<Handle<ItemAsset>, i32> =
+            HashMap::new();
+
         for incoming in in_queue.iter() {
             let (in_quant, in_item) = match items.get(*incoming) {
                 Ok((quant, item)) => (quant.clone(), item.clone()),
                 Err(_) => continue,
             };
 
+            match queue_sorted.get_mut(&in_item) {
+                Some(quant) => {
+                    *quant += *in_quant;
+                }
+                None => {
+                    queue_sorted.insert(in_item.clone(), *in_quant);
+                }
+            };
+
+            cmd.entity(*incoming).despawn_recursive();
+        }
+
+        for (handle, q) in queue_sorted.iter() {
             let mut merged = false;
             for existing_item in content.iter() {
                 let Ok((mut quant, item)) =
@@ -68,15 +85,21 @@ fn work_queue(
                     continue;
                 };
 
-                if item.id() == in_item.id() {
-                    **quant = **quant + *in_quant;
+                if item.id() == handle.id() {
+                    **quant = **quant + *q;
                     merged = true;
                 }
             }
 
             // add
             if !merged {
-                cmd.entity(inventory.bag).add_child(*incoming);
+                let item = cmd
+                    .spawn(ItemBundle {
+                        item: handle.clone(),
+                        quantity: Quantity(*q),
+                    })
+                    .id();
+                cmd.entity(inventory.bag).add_child(item);
             }
         }
 
@@ -109,5 +132,31 @@ impl Default for Inventory {
             bag: Entity::PLACEHOLDER,
             queue: Entity::PLACEHOLDER,
         }
+    }
+}
+
+impl Inventory {
+    #[rustfmt::skip]
+    pub fn in_stock(
+        &self,
+        handle: &Handle<ItemAsset>,
+        quantity: i32,
+        children: &Query<&Children>,
+        items: &Query<(&Handle<ItemAsset>, &Quantity)>,
+    ) -> bool {
+        let available = children
+            .get(self.bag)
+            .ok()
+            .map(|children|{
+                children.iter().flat_map(|child|{
+                    let ( h, q ) = items.get(*child).ok()?;
+                    if h.id() != handle.id(){
+                        return None;
+                    }
+                    return Some(**q);
+                }).sum::<i32>()
+            }).unwrap_or_default();
+
+        return available >= quantity;
     }
 }

@@ -1,3 +1,4 @@
+use super::targets::RenderTargets;
 use crate::prelude::*;
 use bevy::{
     core_pipeline::{
@@ -32,8 +33,6 @@ use render_resource::{
 use renderer::{RenderContext, RenderDevice};
 use texture::{BevyDefault, GpuImage};
 use view::{RenderLayers, ViewTarget};
-
-use super::targets::RenderTargets;
 
 #[allow(unused)]
 pub mod prelude {
@@ -97,7 +96,9 @@ fn clear_highlights(
     highlights: Query<Entity, With<Highlight>>,
 ) {
     highlights.iter().for_each(|entity| {
-        cmd.entity(entity).remove::<Highlight>();
+        if let Some(mut cmd) = cmd.get_entity(entity) {
+            cmd.remove::<Highlight>();
+        }
     });
 }
 
@@ -129,14 +130,18 @@ fn on_highlight_add(
     entity: Entity,
     _component_id: ComponentId,
 ) {
-    world.commands().entity(entity).insert(HIGHTLIGHT);
+    if let Some(mut cmd) = world.commands().get_entity(entity) {
+        cmd.try_insert(HIGHTLIGHT);
+    }
 }
 fn on_highlight_remove(
     mut world: DeferredWorld,
     entity: Entity,
     _component_id: ComponentId,
 ) {
-    world.commands().entity(entity).insert(NORMAL);
+    if let Some(mut cmd) = world.commands().get_entity(entity) {
+        cmd.try_insert(NORMAL);
+    }
     if let Some(mut transform) = world.get_mut::<Transform>(entity) {
         transform.scale = Vec3::ONE;
     }

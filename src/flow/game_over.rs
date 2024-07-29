@@ -4,26 +4,24 @@ use sickle_ui::prelude::*;
 pub struct GameOverPlugin;
 impl Plugin for GameOverPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, check_game_over);
-        app.add_systems(OnEnter(ControlFlow::Score), spawn_score);
+        app.add_event::<GameOverEvent>();
+        app.observe(spawn_score);
     }
 }
 
-fn check_game_over(
-    village: Query<&Village, With<Player>>,
-    mut state: ResMut<NextState<ControlFlow>>,
-) {
-    let Ok(vil) = village.get_single() else {
-        return;
-    };
-
-    if vil.villager_count <= 0 {
-        state.set(ControlFlow::Score);
-    }
+#[derive(Event)]
+pub enum GameOverEvent {
+    Hunger,
+    Debt,
 }
+
+#[derive(Component)]
+struct ScoreTag;
 
 fn spawn_score(
+    trigger: Trigger<GameOverEvent>,
     mut cmd: Commands,
+    mut state: ResMut<NextState<ControlFlow>>,
     village: Query<(&Village, &GameContext), With<Player>>,
     ui: Query<Entity, With<CenterMiddleUi>>,
 ) {
@@ -35,13 +33,23 @@ fn spawn_score(
         return;
     };
 
+    state.set(ControlFlow::Score);
+
     cmd.ui_builder(ui)
         .div_centered(|builder| {
+            builder.insert(ScoreTag);
             builder
                 .panel_bg(PanelConfig::title("Game Over"), |panel| {
+
+                    let message = match trigger.event(){
+                        GameOverEvent::Hunger => "Your villagers died of hunger. You lost.",
+                        GameOverEvent::Debt => "Your debt was to high, the local lord had you executed.",
+                    };
+
                     panel.text(
                         format!(
-                            "You did not met the expected production quota. The local Lord had you executed! {} Years survived",
+                            "{}. {} Years survived",
+                            message,
                             context.current_year()
                         )
                         .as_str(),
@@ -66,10 +74,16 @@ fn spawn_score(
 }
 
 fn back_to_menu(
-    trigger: Trigger<ButtonClicked>,
+    _trigger: Trigger<ButtonClicked>,
+    mut cmd: Commands,
+    score: Query<Entity, With<ScoreTag>>,
     mut state: ResMut<NextState<AppState>>,
-    mut flow: ResMut<NextState<ControlFlow>>,
 ) {
     state.set(AppState::Menu);
-    flow.set(ControlFlow::Intro);
+
+    let Ok(s) = score.get_single() else {
+        return;
+    };
+
+    cmd.entity(s).despawn_recursive();
 }

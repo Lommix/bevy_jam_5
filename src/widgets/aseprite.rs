@@ -29,7 +29,7 @@ impl AsepriteExt for UiBuilder<'_, Entity> {
                 NodeBundle::default(),
                 AsepriteSliceUiBundle {
                     slice: AsepriteSlice::from(slice),
-                    aseprite: handle.clone(),
+                    aseprite: handle,
                     ..default()
                 },
             ),
