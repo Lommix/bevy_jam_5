@@ -1,0 +1,8 @@
+(
+    name: "Wood",
+    description: "Common wood from a tree, used to build stuff.",
+    icon: "wood",
+    value: 0.1,
+    rarity: Common,
+    tags: [Sellable],
+)

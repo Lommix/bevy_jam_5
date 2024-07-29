@@ -2,7 +2,7 @@
     name: "Sugarcane",
     description: "A tall tropical grass that is the primary source of sugar.",
     icon: "sugarcane",
-    value: 2.49,
+    value: 0.1,
     rarity: Common,
     tags: [Sellable],
 )

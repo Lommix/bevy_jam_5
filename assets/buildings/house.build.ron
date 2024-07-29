@@ -2,6 +2,13 @@
     name: "House",
     description: "A Building for 4 Villagers",
     sprite: "raw/house.aseprite",
-	build_time: 2,
+    build_time: 2,
+    workforce: 0,
     produces: [],
+    item_cost: [
+        (
+            quantity: 10,
+            item: "items/wood.item.ron",
+        ),
+    ],
 )

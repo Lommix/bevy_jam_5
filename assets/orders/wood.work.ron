@@ -1,0 +1,13 @@
+(
+    name: "Wood harvesting",
+    description: "Creating logs for buildings",
+    interval: Step(1),
+    workforce: 1,
+    inputs: [],
+    outputs: [
+        (
+            quantity: 1,
+            item: "items/wood.item.ron",
+        ),
+    ],
+)

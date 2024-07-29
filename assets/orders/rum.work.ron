@@ -5,7 +5,7 @@
     workforce: 1,
     inputs: [
         (
-            quantity: 3,
+            quantity: 2,
             item: "items/sugarcane.item.ron",
         ),
     ],

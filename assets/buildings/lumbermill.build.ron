@@ -1,0 +1,9 @@
+(
+    name: "Lumbermill",
+    description: "Generates wood each season",
+    sprite: "raw/lumbermill.aseprite",
+    build_time: 2,
+	workforce: 1,
+    produces: ["orders/wood.work.ron"],
+    item_cost: [],
+)

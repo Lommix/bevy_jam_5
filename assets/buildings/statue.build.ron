@@ -1,0 +1,15 @@
+(
+    name: "Statue of Victory",
+    description: "A symbol of victory",
+    sprite: "raw/statue.aseprite",
+    build_time: 0,
+    workforce: 0,
+    build_cost: Some(500),
+    item_cost: [
+        (
+            quantity: 100,
+            item: "items/wood.item.ron",
+        ),
+    ],
+    produces: [],
+)

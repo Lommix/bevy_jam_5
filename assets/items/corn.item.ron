@@ -2,7 +2,7 @@
     name: "Corn",
     description: "A healthy and crunchy vegetable, rich in vitamins.",
     icon: "corn",
-    value: 2.5,
+    value: 0.2,
     rarity: Common,
     tags: [Eatable, Sellable, Plantable],
 )

@@ -2,7 +2,7 @@
 	name: "Wheat",
 	description: "A cereal grain, which is a worldwide staple food used to make flour.",
 	icon: "wheat",
-    value: 2.49,
+    value: 0.1,
     rarity: Common,
-    tags: [Sellable],
+    tags: [Sellable, Eatable],
 )

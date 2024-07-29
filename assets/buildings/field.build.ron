@@ -3,11 +3,13 @@
     description: "A Field for crops",
     sprite: "raw/field.aseprite",
     build_time: 0,
+    workforce: 1,
+    item_cost: [],
     produces: [
-        "orders/potatos.work.ron",
         "orders/wheat.work.ron",
         "orders/sugarcane.work.ron",
         "orders/grapes.work.ron",
         "orders/corn.work.ron",
+        "orders/potatos.work.ron",
     ],
 )

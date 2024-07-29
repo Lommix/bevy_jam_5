@@ -2,7 +2,7 @@
     name: "Potato",
     description: "Starchy tubers cultivated as a staple crop around the world.",
     icon: "potato",
-    value: 2.5,
+    value: 0.1,
     rarity: Common,
     tags: [Eatable, Sellable, Plantable],
 )

@@ -2,7 +2,7 @@
     name: "Double Corn",
     description: "A very strong alcoholic drink.",
     icon: "keg",
-    value: 2.49,
+    value: 5,
     rarity: Rare,
-    tags: [Sellable],
+    tags: [Sellable, Eatable],
 )

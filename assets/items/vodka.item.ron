@@ -2,7 +2,7 @@
     name: "Vodka",
     description: "A strong alcoholic drink from distilled wheat",
     icon: "vodka",
-    value: 20.49,
+    value: 8,
     rarity: Rare,
-    tags: [Sellable],
+    tags: [Sellable, Eatable],
 )

@@ -2,7 +2,7 @@
     name: "Rum",
     description: "An alcoholic beverage made from sugarcane byproducts, such as molasses or honey.",
     icon: "rum",
-    value: 2.5,
+    value: 22,
     rarity: Common,
     tags: [Eatable, Sellable, Plantable],
 )

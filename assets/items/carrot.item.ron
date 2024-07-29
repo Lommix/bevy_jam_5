@@ -2,7 +2,7 @@
     name: "Carrot",
     description: "A healthy and crunchy vegetable, rich in vitamins.",
     icon: "carrot",
-    value: 2.5,
+    value: 0.2,
     rarity: Common,
     tags: [Eatable, Sellable, Plantable],
 )

@@ -1,13 +1,19 @@
 (
-    name: "Distillery",
-    description: "A Workshop for crafting",
+    name: "Brewery",
+    description: "A workshop for crafting drinks",
     sprite: "raw/workshop.aseprite",
     build_time: 3,
+    workforce: 0,
+    item_cost: [
+        (
+            quantity: 20,
+            item: "items/wood.item.ron",
+        ),
+    ],
     produces: [
         "orders/vodka.work.ron",
         "orders/rum.work.ron",
         "orders/wine.work.ron",
         "orders/beer.work.ron",
-        "orders/double_corn.work.ron",
     ],
 )
