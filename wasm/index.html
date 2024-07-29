@@ -1,17 +1,53 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <head>
+            <title>Brew Tycoon</title>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="description" content="Brew Tycoon - bevy jam 5 entry" />
+            <style>
+                * {
+                    marign: 0;
+                    padding: 0;
+                }
 
-<body style="margin: 0px;">
-  <script type="module">
-    import './restart-audio-context.js'
-    import init from './bevy_game.js'
+                html {
+                    width: 100% !important;
+                    height: 100%% !important;
+                }
 
-    init().catch((error) => {
-      if (!error.message.startsWith("Using exceptions for control flow, don't mind me. This isn't actually an error!")) {
-        throw error;
-      }
-    });
-  </script>
-</body>
+                body {
+                    width: 100% !important;
+                    height: 100%% !important;
+                }
 
+                * {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                canvas {
+                    width: 100% !important;
+                    height: 100%% !important;
+                }
+            </style>
+        </head>
+    </head>
+
+    <body style="margin: 0px">
+        <script type="module">
+            import "./restart-audio-context.js";
+            import init from "./brew_tycoon.js";
+            init().catch((error) => {
+                if (
+                    !error.message.startsWith(
+                        "Using exceptions for control flow, don't mind me. This isn't actually an error!"
+                    )
+                ) {
+                    throw error;
+                }
+            });
+        </script>
+    </body>
 </html>
